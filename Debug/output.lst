@@ -1,0 +1,399 @@
+Zilog eZ80 Macro Assembler Version 4.3 (19073001) RELISTED23-Apr-23     21:57:26     page:   1
+
+
+PC     Object              I  Line    Source 
+                           A     1    ;
+                           A     2    ; Title:	Output functions.
+                           A     3    ; Author:	Lennart Benschop
+                           A     4    ; Created:	27/12/2022
+                           A     5    ;
+                           A     6    
+                           A     7    			.ASSUME	ADL = 1			
+                           A     8    
+                           B     0    			INCLUDE	"equs.inc"
+                           B     1    ;
+                           B     2    ; Title:	Memory Dump - Equs
+                           B     3    ; Author:	Dean Belfield
+                           B     4    ; Created:	15/11/2022
+                           B     5    ; Last Updated:	15/11/2022
+                           B     6    ;
+                           B     7    ; Modinfo:
+                           B     8    				
+       0000FF00            B     9    RAM_Top:		EQU		0FF00h
+       00000000            B    10    Stack_Top:		EQU		00000h	; Stack at top
+                           B    11    	
+                           B    12    ; For GPIO
+                           B    13    ; PA not available on eZ80L92
+                           B    14    ;
+       00000096            B    15    PA_DR:			EQU		96h
+       00000097            B    16    PA_DDR:			EQU		97h
+       00000098            B    17    PA_ALT1:		EQU		98h
+       00000099            B    18    PA_ALT2:		EQU		99h
+       0000009A            B    19    PB_DR:          	EQU		9Ah
+       0000009B            B    20    PB_DDR:        	 	EQU		9Bh
+       0000009C            B    21    PB_ALT1:        	EQU		9Ch
+       0000009D            B    22    PB_ALT2:        	EQU		9Dh
+       0000009E            B    23    PC_DR:          	EQU		9Eh
+       0000009F            B    24    PC_DDR:         	EQU		9Fh
+       000000A0            B    25    PC_ALT1:        	EQU		A0h
+       000000A1            B    26    PC_ALT2:        	EQU		A1h
+       000000A2            B    27    PD_DR:          	EQU		A2h
+       000000A3            B    28    PD_DDR:			EQU		A3h
+       000000A4            B    29    PD_ALT1:		EQU		A4h
+       000000A5            B    30    PD_ALT2:		EQU		A5h
+                           B    31    	
+       00000000            B    32    GPIOMODE_OUT:		EQU		0	; Output
+       00000001            B    33    GPIOMODE_IN:		EQU		1	; Input
+       00000002            B    34    GPIOMODE_DIO:		EQU		2	; Open Drain IO
+       00000003            B    35    GPIOMODE_SIO:		EQU		3	; Open Source I
+       00000004            B    36    GPIOMODE_INTD:		EQU		4	; Interrupt, Du
+       00000005            B    37    GPIOMODE_ALTF:		EQU		5;	; Alt Function
+       00000006            B    38    GPIOMODE_INTAL:		EQU		6	; Interrupt, Ac
+       00000007            B    39    GPIOMODE_INTAH:		EQU		7	; Interrupt, Ac
+       00000008            B    40    GPIOMODE_INTFE:		EQU		8	; Interrupt, Fa
+       00000009            B    41    GPIOMODE_INTRE:		EQU		9	; Interrupt, Ri
+                           B    42    	
+                           B    43    ; For serial.asm
+                           B    44    ; 
+       016E3600            B    45    BASE_CLOCK		EQU	24000000	; It's actually
+                           B    46    
+       00000003            B    47    BAUD_500000		EQU	BASE_CLOCK / (16 * 500000)
+       00000006            B    48    BAUD_250000		EQU	BASE_CLOCK / (16 * 250000)
+       0000000C            B    49    BAUD_125000		EQU	BASE_CLOCK / (16 * 125000)
+       0000004E            B    50    BAUD_19200		EQU	BASE_CLOCK / (16 * 19200)	
+                           B    51    
+                           B    52    ; For interrupts.asm
+                           B    53    ;
+                           B    54    
+                           B    55    ;UARTs
+                           B    56    ;
+       00000018            B    57    UART0_IVECT		EQU		18h
+       0000001A            B    58    UART1_IVECT		EQU		1Ah
+                           B    59    
+                           B    60    ;Ports
+                           B    61    ;
+       00000030            B    62    PB0_IVECT   		EQU   	30h	; AGON ITRP Int
+       00000032            B    63    PB1_IVECT  	  	EQU  	32h	; AGON VBLANK Inter
+       00000034            B    64    PB2_IVECT  	  	EQU   	34h
+       00000036            B    65    PB3_IVECT  	  	EQU   	36h
+       00000038            B    66    PB4_IVECT    		EQU   	38h
+       0000003A            B    67    PB5_IVECT    		EQU   	3Ah
+       0000003C            B    68    PB6_IVECT    		EQU   	3Ch
+       0000003E            B    69    PB7_IVECT    		EQU   	3Eh
+                           B    70                           
+       00000040            B    71    PC0_IVECT    		EQU   	40h
+       00000042            B    72    PC1_IVECT    		EQU   	42h
+       00000044            B    73    PC2_IVECT    		EQU   	44h
+       00000046            B    74    PC3_IVECT    		EQU   	46h
+       00000048            B    75    PC4_IVECT    		EQU   	48h
+       0000004A            B    76    PC5_IVECT    		EQU   	4Ah
+       0000004C            B    77    PC6_IVECT    		EQU   	4Ch
+       0000004E            B    78    PC7_IVECT    		EQU   	4Eh
+                           B    79                           
+       00000050            B    80    PD0_IVECT    		EQU   	50h
+       00000052            B    81    PD1_IVECT    		EQU   	52h
+       00000054            B    82    PD2_IVECT    		EQU   	54h
+       00000056            B    83    PD3_IVECT    		EQU   	56h
+       00000058            B    84    PD4_IVECT    		EQU   	58h
+       0000005A            B    85    PD5_IVECT    		EQU   	5Ah
+       0000005C            B    86    PD6_IVECT    		EQU   	5Ch
+       0000005E            B    87    PD7_IVECT    		EQU   	5Eh
+                           B    88    
+                           B    89    ; Originally in main.asm
+                           B    90    ;
+       0000000D            B    91    CR:			EQU     0DH
+       0000000A            B    92    LF:			EQU     0AH
+       0000001B            B    93    ESC:		EQU     1BH
+                           B     0    			INCLUDE "mos_api.inc"
+                           B     1    ;
+                           B     2    ; Title:	AGON MOS - API for user projects
+                           B     3    ; Author:	Dean Belfield
+                           B     4    ; Created:	03/08/2022
+                           B     5    ; Last Updated:	22/03/2023
+                           B     6    ;
+                           B     7    ; Modinfo:
+                           B     8    ; 05/08/2022:	Added mos_feof
+                           B     9    ; 09/08/2022:	Added system variables: cursorX
+                           B    10    ; 18/08/2022:	Added system variables: scrchar
+                           B    11    ; 05/09/2022:	Added mos_ren, vdp_pflag_mode
+                           B    12    ; 24/09/2022:	Added mos_getError, mos_mkdir
+                           B    13    ; 13/10/2022:	Added mos_oscli
+                           B    14    ; 23/02/2023:	Added more sysvars, fixed typo 
+                           B    15    ; 04/03/2023:	Added sysvar_scrpixelIndex
+                           B    16    ; 08/03/2023:	Renamed sysvar_keycode to sysva
+                           B    17    ; 15/03/2023:	Added mos_copy, mos_getrtc, mos
+                           B    18    ; 21/03/2023:	Added mos_setintvector, sysvars
+                           B    19    ; 22/03/2023:	The VDP commands are now indexe
+                           B    20    
+                           B    21    ; VDP control (VDU 23, 0, n)
+                           B    22    ;
+       00000080            B    23    vdp_gp:			EQU 	80h
+       00000081            B    24    vdp_keycode:		EQU 	81h
+       00000082            B    25    vdp_cursor:		EQU	82h
+       00000083            B    26    vdp_scrchar:		EQU	83h
+       00000084            B    27    vdp_scrpixel:		EQU	84h
+       00000085            B    28    vdp_audio:		EQU	85h
+       00000086            B    29    vdp_mode:		EQU	86h
+       00000087            B    30    vdp_rtc:		EQU	87h
+       00000088            B    31    vdp_keystate:		EQU	88h
+       000000C0            B    32    vdp_logicalcoords:	EQU	C0h
+       000000FF            B    33    vdp_terminalmode:	EQU	FFh
+                           B    34    
+                           B    35    ; MOS high level functions
+                           B    36    ;
+       00000000            B    37    mos_getkey:		EQU	00h
+       00000001            B    38    mos_load:		EQU	01h
+       00000002            B    39    mos_save:		EQU	02h
+       00000003            B    40    mos_cd:			EQU	03h
+       00000004            B    41    mos_dir:		EQU	04h
+       00000005            B    42    mos_del:		EQU	05h
+       00000006            B    43    mos_ren:		EQU	06h
+       00000007            B    44    mos_mkdir:		EQU	07h
+       00000008            B    45    mos_sysvars:		EQU	08h
+       00000009            B    46    mos_editline:		EQU	09h
+       0000000A            B    47    mos_fopen:		EQU	0Ah
+       0000000B            B    48    mos_fclose:		EQU	0Bh
+       0000000C            B    49    mos_fgetc:		EQU	0Ch
+       0000000D            B    50    mos_fputc:		EQU	0Dh
+       0000000E            B    51    mos_feof:		EQU	0Eh
+       0000000F            B    52    mos_getError:		EQU	0Fh
+       00000010            B    53    mos_oscli:		EQU	10h
+       00000011            B    54    mos_copy:		EQU	11h
+       00000012            B    55    mos_getrtc:		EQU	12h
+       00000013            B    56    mos_setrtc:		EQU	13h
+       00000014            B    57    mos_setintvector:	EQU	14h
+                           B    58    
+                           B    59    ; FatFS file access functions
+                           B    60    ;
+       00000080            B    61    ffs_fopen:		EQU	80h
+       00000081            B    62    ffs_fclose:		EQU	81h
+       00000082            B    63    ffs_fread:		EQU	82h
+       00000083            B    64    ffs_fwrite:		EQU	83h
+       00000084            B    65    ffs_fseek:		EQU	84h
+       00000085            B    66    ffs_ftruncate:		EQU	85h
+       00000086            B    67    ffs_fsync:		EQU	86h
+       00000087            B    68    ffs_fforward:		EQU	87h
+       00000088            B    69    ffs_fexpand:		EQU	88h
+       00000089            B    70    ffs_fgets:		EQU	89h
+       0000008A            B    71    ffs_fputc:		EQU	8Ah
+       0000008B            B    72    ffs_fputs:		EQU	8Bh
+       0000008C            B    73    ffs_fprintf:		EQU	8Ch
+       0000008D            B    74    ffs_ftell:		EQU	8Dh
+       0000008E            B    75    ffs_feof:		EQU	8Eh
+       0000008F            B    76    ffs_fsize:		EQU	8Fh
+       00000090            B    77    ffs_ferror:		EQU	90h
+                           B    78    
+                           B    79    ; FatFS directory access functions
+                           B    80    ;
+       00000091            B    81    ffs_dopen:		EQU	91h
+       00000092            B    82    ffs_dclose:		EQU	92h
+       00000093            B    83    ffs_dread:		EQU	93h
+       00000094            B    84    ffs_dfindfirst:		EQU	94h
+       00000095            B    85    ffs_dfindnext:		EQU	95h
+                           B    86    
+                           B    87    ; FatFS file and directory management functions
+                           B    88    ;
+       00000096            B    89    ffs_stat:		EQU	96h
+       00000097            B    90    ffs_unlink:		EQU	97h
+       00000098            B    91    ffs_rename:		EQU	98h
+       00000099            B    92    ffs_chmod:		EQU	99h
+       0000009A            B    93    ffs_utime:		EQU	9Ah
+       0000009B            B    94    ffs_mkdir:		EQU	9Bh
+       0000009C            B    95    ffs_chdir:		EQU	9Ch
+       0000009D            B    96    ffs_chdrive:		EQU	9Dh
+       0000009E            B    97    ffs_getcwd:		EQU	9Eh
+                           B    98    
+                           B    99    ; FatFS volume management and system configurat
+                           B   100    ;
+       0000009F            B   101    ffs_mount:		EQU	9Fh
+       000000A0            B   102    ffs_mkfs:		EQU	A0h
+       000000A1            B   103    ffs_fdisk		EQU	A1h
+       000000A2            B   104    ffs_getfree:		EQU	A2h
+       000000A3            B   105    ffs_getlabel:		EQU	A3h
+       000000A4            B   106    ffs_setlabel:		EQU	A4h
+       000000A5            B   107    ffs_setcp:		EQU	A5h
+                           B   108    	
+                           B   109    ; File access modes
+                           B   110    ;
+       00000001            B   111    fa_read:		EQU	01h
+       00000002            B   112    fa_write:		EQU	02h
+       00000000            B   113    fa_open_existing:	EQU	00h
+       00000004            B   114    fa_create_new:		EQU	04h
+       00000008            B   115    fa_create_always:	EQU	08h
+       00000010            B   116    fa_open_always:		EQU	10h
+       00000030            B   117    fa_open_append:		EQU	30h
+                           B   118    	
+                           B   119    ; System variable indexes for api_sysvars
+                           B   120    ; Index into _sysvars in globals.asm
+                           B   121    ;
+       00000000            B   122    sysvar_time:		EQU	00h	; 4: Clock timer in
+       00000004            B   123    sysvar_vpd_pflags:	EQU	04h	; 1: Flags to indic
+       00000005            B   124    sysvar_keyascii:	EQU	05h	; 1: ASCII keycode,
+       00000006            B   125    sysvar_keymods:		EQU	06h	; 1: Keycode modifi
+       00000007            B   126    sysvar_cursorX:		EQU	07h	; 1: Cursor X posit
+       00000008            B   127    sysvar_cursorY:		EQU	08h	; 1: Cursor Y posit
+       00000009            B   128    sysvar_scrchar:		EQU	09h	; 1: Character read
+       0000000A            B   129    sysvar_scrpixel:	EQU	0Ah	; 3: Pixel data rea
+       0000000D            B   130    sysvar_audioChannel:	EQU	0Dh	; 1: Audio chan
+       0000000E            B   131    sysvar_audioSuccess:	EQU	0Eh	; 1: Audio chan
+       0000000F            B   132    sysvar_scrWidth:	EQU	0Fh	; 2: Screen width i
+       00000011            B   133    sysvar_scrHeight:	EQU	11h	; 2: Screen height 
+       00000013            B   134    sysvar_scrCols:		EQU	13h	; 1: Screen columns
+       00000014            B   135    sysvar_scrRows:		EQU	14h	; 1: Screen rows in
+       00000015            B   136    sysvar_scrColours:	EQU	15h	; 1: Number of colo
+       00000016            B   137    sysvar_scrpixelIndex:	EQU	16h	; 1: Index of p
+       00000017            B   138    sysvar_vkeycode:	EQU	17h	; 1: Virtual key co
+       00000018            B   139    sysvar_vkeydown		EQU	18h	; 1: Virtual key st
+       00000019            B   140    sysvar_vkeycount:	EQU	19h	; 1: Incremented ev
+       0000001A            B   141    sysvar_rtc:		EQU	1Ah	; 8: Real time clock da
+       00000022            B   142    sysvar_keydelay:	EQU	22h	; 2: Keyboard repea
+       00000024            B   143    sysvar_keyrate:		EQU	24h	; 2: Keyboard repea
+       00000026            B   144    sysvar_keyled:		EQU	26h	; 1: Keyboard LED s
+                           B   145    	
+                           B   146    ; Flags for the VPD protocol
+                           B   147    ;
+       00000001            B   148    vdp_pflag_cursor:	EQU	00000001b
+       00000002            B   149    vdp_pflag_scrchar:	EQU	00000010b
+       00000004            B   150    vdp_pflag_point:	EQU	00000100b
+       00000008            B   151    vdp_pflag_audio:	EQU	00001000b
+       00000010            B   152    vdp_pflag_mode:		EQU	00010000b
+       00000020            B   153    vdp_pflag_rtc:		EQU	00100000b
+                           B   154    	
+                           B   155    ;
+                           B   156    ; Macro for calling the API
+                           B   157    ; Parameters:
+                           B   158    ; - function: One of the function numbers liste
+                           B   159    ;
+                           B   160    MOSCALL:		MACRO	function
+                           B   161    			LD	A, function
+                           B   162    			RST.LIS	08h
+                           B   163    			ENDMACRO 	
+                           A    11    
+                           A    12    			SEGMENT CODE
+                           A    13    			
+                           A    14    			XDEF	Print_String
+                           A    15    			XDEF	Print_CString
+                           A    16    			XDEF	Print_Decimal
+                           A    17    			XDEF	Print_CRLF
+                           A    18    			XDEF	Setup_Screen
+                           A    19    			XDEF	Inverse_Video
+                           A    20    			XDEF	True_Video
+                           A    21    			
+                           A    22    
+0002FA                     A    23    Print_Decimal:	
+                           A    24    ; Print a decimal number (less than 1000000)';
+                           A    25    ;
+                           A    26    ; Input: HL 24-bit number to print.
+0002FA FDE5                A    27    			PUSH	IY
+0002FC D5                  A    28    			PUSH	DE
+0002FD C5                  A    29    			PUSH 	BC
+0002FE FD21 28 03 00       A    30    			LD	IY, Num_Table
+000303 0606                A    31    			LD	B, 6		; Consider 6 digits
+000305 0E06                A    32    			LD	C, 6		; Leading zero coun
+000307 FD1700              A    33    Print_Dec1:		LD	DE, (IY+0) 	; Take next pow
+00030A ED3304              A    34    			LEA	IY, IY+4
+00030D 3E2F                A    35    			LD	A, '0'-1
+00030F 3C                  A    36    $$:			INC	A
+000310 A7                  A    37    			AND 	A	
+000311 ED52                A    38    			SBC 	HL, DE		; Repeatedly su
+000313 30 FA               A    39    			JR	NC, $B
+000315 19                  A    40    			ADD	HL, DE		; Undo the last sub
+000316 FE30                A    41    			CP	'0'
+000318 20 03               A    42    			JR	NZ, $F		; Don't print leadi
+00031A 0D                  A    43    			DEC	C	
+00031B 20 04               A    44    			JR	NZ, Print_Dec2	; But do print 
+00031D 5BD7                A    45    $$:			RST.LIL	10h
+00031F 0E01                A    46    			LD	C, 1		; Make sure the nex
+000321 10 E4               A    47    Print_Dec2:		DJNZ	Print_Dec1
+000323 C1                  A    48    			POP 	BC
+000324 D1                  A    49    			POP	DE
+000325 FDE1                A    50    			POP	IY
+000327 C9                  A    51    			RET
+                           A    52    
+000328 A0860100            A    53    Num_Table		DL	100000
+00032C 10270000            A    54    			DL	10000
+000330 E8030000            A    55    			DL	1000
+000334 64000000            A    56    			DL	100
+000338 0A000000            A    57    			DL	10
+00033C 01000000            A    58    			DL	1
+                           A    59    
+                           A    60    ; Print a counted string (preceded by a count b
+                           A    61    ; Parameters:
+                           A    62    ;  HL: Address of string (24-bit pointer)
+                           A    63    ;
+000340 C5                  A    64    Print_CString:          PUSH	BC  			
+000341 46                  A    65    			LD 	B, (HL)
+000342 AF                  A    66    			XOR	A
+000343 B8                  A    67    			CP	B
+000344 28 07               A    68    			JR	Z, Print_CString_End
+000346 23                  A    69    			INC 	HL
+000347 7E                  A    70    $$:			LD 	A, (HL)
+000348 5BD7                A    71    			RST.LIL 10h
+00034A 23                  A    72    			INC 	HL
+00034B 10 FA               A    73    			DJNZ 	$B	
+00034D C1                  A    74    Print_CString_End:	POP	BC	
+00034E C9                  A    75    			RET	
+                           A    76    			
+                           A    77    ; Print Carriage-return and linefeed.			
+00034F 21 9C 03 00         A    78    Print_CRLF:		LD	HL, s_CRLF			
+                           A    79    ; Print a zero-terminated string
+                           A    80    ; Parameters:
+                           A    81    ;  HL: Address of string (24-bit pointer)
+                           A    82    ;
+000353 7E                  A    83    Print_String		LD	A,(HL)
+000354 B7                  A    84    			OR	A
+000355 C8                  A    85    			RET	Z
+000356 5BD7                A    86    			RST.LIL	10h
+000358 23                  A    87    			INC	HL
+000359 18 F8               A    88    			JR	Print_String
+                           A    89    		
+                           A    90    
+                           A    91    ; Set display to inverse video	
+00035B 21 9F 03 00         A    92    Inverse_Video:		LD 	HL, c_INVVID
+00035F 18 DF               A    93    			JR 	Print_CString
+                           A    94    
+                           A    95    ; Set display to true video	
+000361 21 A4 03 00         A    96    True_Video:		LD 	HL, c_TRUEVID
+000365 18 D9               A    97    			JR 	Print_CString
+                           A    98    
+                           A    99    ; Put VDU in 80 column mode, of not already the
+000367 DDE5                A   100    Setup_Screen:		PUSH 	IX
+                           A   101    			MOSCALL mos_sysvars
+00036D DDCB04A6            A   102    			RES 	4, (IX+sysvar_vpd_pflags)	
+000371 DDCB0466            A   103    $$:			BIT	4, (IX+sysvar_vpd_pflags)		
+000375 28 FA               A   104    			JR 	Z, $B		        ; Wait unti
+000377 DD7E14              A   105    			LD	A, (IX+sysvar_scrRows)
+00037A DD7E13              A   106    			LD	A, (IX+sysvar_scrCols)
+00037D FE50                A   107    			CP	80
+00037F 30 08               A   108    			JR	NC, Setup_End		; Apparentl
+000381 3E16                A   109    			LD	A, 22
+000383 5BD7                A   110    			RST.LIL 10h
+000385 3E03                A   111    			LD	A, 3
+000387 5BD7                A   112    			RST.LIL 10h			; Enter Mode 3
+000389 DDCB04A6            A   113    Setup_End:		RES 	4, (IX+sysvar_vpd_pflag
+00038D DDCB0466            A   114    $$:			BIT	4, (IX+sysvar_vpd_pflags)		
+000391 28 FA               A   115    			JR 	Z, $B		        ; Wait unti
+000393 DD7E14              A   116    			LD	A, (IX+sysvar_scrRows)
+000396 DD7E13              A   117    			LD	A, (IX+sysvar_scrCols)
+000399 DDE1                A   118    			POP	IX
+00039B C9                  A   119    			RET
+                           A   120    			
+00039C 0D0A00              A   121    s_CRLF:			DB	13,10,0
+                           A   122    
+00039F 04                  A   123    c_INVVID:		DB	4
+0003A0 1100                A   124    			DB 	17, 0 		; Forgeground black
+0003A2 118F                A   125    			DB	17, 143		; Background white
+0003A4 04                  A   126    c_TRUEVID:		DB	4
+0003A5 110F                A   127    			DB	17, 15		; Foreground white
+0003A7 1180                A   128    			DB	17, 128		; Background black
+0003A9 040F1700 86         A   129    c_GETMODE               DB	4, 15,23,0,vdp_mode
+                           A   130    ; RAM
+                           A   131    ; 
+                           A   132    			DEFINE	LORAM, SPACE = ROM
+                           A   133    			SEGMENT LORAM
+                           A   134    			
+
+
+Errors: 0
+Warnings: 0
+Lines Assembled: 394
