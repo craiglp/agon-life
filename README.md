@@ -24,7 +24,7 @@ handle left/right cells, I place one zero column on the left.  And for the botto
 I have one extra byte.
 
 If Cell is alive it will be set to 1, if it is dead, it will be zero.
-
+```
  Memory Map With Upper/Lower/Left/Right buffer.  Total of 1108 Bytes for a 40x25 matrix
  X = potential cell position, 0 = always zero
 
@@ -57,6 +57,7 @@ If Cell is alive it will be set to 1, if it is dead, it will be zero.
 19  0 X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X
 1A  0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
 1B  0  <= needed for last bottom right check
+```
 
 Requires: 
 MOS 1.03
