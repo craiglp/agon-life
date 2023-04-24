@@ -148,7 +148,7 @@ LIFE:
             CP      ESC				;Escape pressed?
             JR      NZ,LIFE			;Key pressed but not Escape, reload new random cells
 
-			LD		HL, s_LIFE3		;Escape pressed, clean up and exit
+			LD		HL, s_LIFE_END	;Escape pressed, clean up and exit
 			LD		BC, 0
 			LD		A, 0
 			RST.LIS	18h
@@ -330,10 +330,6 @@ $$:			AND		0Fh
 ; initialised to a non zero value or this function will always return
 ; zero. Also r_seed must be in RAM, you can see why......			
 RAND_8:
-			;LD A,R
-			;ADD A, 1
-			;LD (r_seed), A
-
 			LD	A,(r_seed)	; get seed
 			AND	#B8h		; mask non feedback bits
 			SCF				; set carry
@@ -347,46 +343,14 @@ RAND_8:
 	r_seed:
 			DB	254			; prng seed byte (must not be zero)
 	
-RAND_0:
-			push	IX
-			ld		IX,#0
-			add		IX,SP
-			ld		C,(ix)    ;get the Mask
-			ld		A,(_SEED)  ;get the Seed
-			ld		B,A	
-			ld		A,R  
-			add		A,B        ;add the value of R to the Seed
-			ld		B,A
-			ld		A,R
-			rlca            ;rotation to the left
-			sub		A,B        ;and subtracts it from the value 
-			ld		(_SEED),A  ;save as Seed 
-			and		C          ;apply the Mask
-			ld		L,A        ;return L
-			pop		IX
-			ret
-			
-_TEST:	
-			LD HL, s_RTC
-			MOSCALL mos_getrtc
-			RET
 
 ; Text strings
 ;
-s_RTC:		DB	0
-
-s_CONWAY1:	DB	"Conway Start\n\r", 0
-s_LIFE:		DB 	"\n\rGame of Life\n\r", 0
-s_LIFE1:	DB 	"\n\rLoad Random\n\r", 0
-s_LIFE2:	DB 	"Print Cells\n\r", 0
-s_LIFE3:	DB 	"\n\rFinished\n\r", 0
-s_LIFE4:	DB 	"\n\rConway\n\r", 0
+s_LIFE_END:	DB 	"\n\rFinished\n\r", 0
 s_cr_lf:	DB	"\n\r", 0
 s_cr:		DB	"\r", 0
 
 
-_SEED:		DB
-	
 _MATRIX_START:
 	
 ; RAM

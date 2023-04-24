@@ -1,4 +1,4 @@
-Zilog eZ80 Macro Assembler Version 4.3 (19073001) RELISTED23-Apr-23     22:15:44     page:   1
+Zilog eZ80 Macro Assembler Version 4.3 (19073001) RELISTED23-Apr-23     22:21:52     page:   1
 
 
 PC     Object              I  Line    Source 
@@ -296,11 +296,11 @@ PC     Object              I  Line    Source
        00000019            A    36    			ROWS        EQU     25             
        00000028            A    37    			COLS        EQU     40             
                            A    38    			
-       000001B8            A    39    			CURRBASE    EQU     _MATRIX_START  
-       000001E2            A    40    			CURRSTART   EQU     CURRBASE+COLS+2
+       00000146            A    39    			CURRBASE    EQU     _MATRIX_START  
+       00000170            A    40    			CURRSTART   EQU     CURRBASE+COLS+2
                            A    41    
-       000005A0            A    42    			NEXTBASE    EQU     CURRBASE+(ROWS 
-       000005CA            A    43    			NEXTSTART   EQU     NEXTBASE+COLS+2
+       0000052E            A    42    			NEXTBASE    EQU     CURRBASE+(ROWS 
+       00000558            A    43    			NEXTSTART   EQU     NEXTBASE+COLS+2
                            A    44    			
        0000005D            A    45    			TOT_CELLS	EQU		(ROWS * 2) + CO
                            A    46    			
@@ -378,14 +378,14 @@ PC     Object              I  Line    Source
                            A   118    			;LD 		HL, _TEST
                            A   119    			;CALL	Print_String
 000156                     A   120    START:
-000156 21 FA 02            A   121                LD      HL,CURRBASE     ;Clear Curr
-000159 11 FB 02            A   122                LD      DE,CURRBASE+1 
+000156 21 88 02            A   121                LD      HL,CURRBASE     ;Clear Curr
+000159 11 89 02            A   122                LD      DE,CURRBASE+1 
 00015C AF                  A   123                XOR     A               ;Set to Zer
 00015D 77                  A   124                LD      (HL),A 
 00015E 015D00              A   125                LD      BC,TOT_CELLS    ;Cells to b
 000161 EDB0                A   126                LDIR                    ;Do the Cop
-000163 21 A0 05            A   127                LD      HL,NEXTBASE     ;Clear Next
-000166 11 A1 05            A   128                LD      DE,NEXTBASE+1 
+000163 21 2E 05            A   127                LD      HL,NEXTBASE     ;Clear Next
+000166 11 2F 05            A   128                LD      DE,NEXTBASE+1 
 000169 AF                  A   129                XOR     A               ;Set to Zer
 00016A 77                  A   130                LD      (HL),A 
 00016B 015D00              A   131                LD      BC,TOT_CELLS    ;1108 cells
@@ -408,7 +408,7 @@ PC     Object              I  Line    Source
 000180 FE1B                A   148                CP      ESC				;Escape pre
 000182 20 EF               A   149                JR      NZ,LIFE			;Key presse
                            A   150    
-000184 21 DC 02            A   151    			LD		HL, s_LIFE3		;Escape pre
+000184 21 76 02            A   151    			LD		HL, s_LIFE_END	;Escape pre
 000187 010000              A   152    			LD		BC, 0
 00018A 3E00                A   153    			LD		A, 0
 00018C 49DF                A   154    			RST.LIS	18h
@@ -432,8 +432,8 @@ PC     Object              I  Line    Source
                            A   172    			;    * Any dead cell with three liv
                            A   173    			;    * All other live cells die in 
 00019E                     A   174    CONWAY:
-00019E DD21 E2 01          A   175                LD      IX,CURRSTART
-0001A2 21 CA 05            A   176                LD      HL,NEXTSTART
+00019E DD21 70 01          A   175                LD      IX,CURRSTART
+0001A2 21 58 05            A   176                LD      HL,NEXTSTART
 0001A5 0619                A   177                LD      B,ROWS
 0001A7                     A   178    	NEWROW:              
 0001A7 C5                  A   179                PUSH    BC ;Save Registers
@@ -477,8 +477,8 @@ PC     Object              I  Line    Source
 0001DF 10 C6               A   217                DJNZ    NEWROW               ;Repea
                            A   218    
                            A   219                ;Copy next matrix to current
-0001E1 21 CA 05            A   220                LD      HL,NEXTSTART 
-0001E4 11 E2 01            A   221                LD      DE,CURRSTART 
+0001E1 21 58 05            A   220                LD      HL,NEXTSTART 
+0001E4 11 70 01            A   221                LD      DE,CURRSTART 
 0001E7 010004              A   222                LD      BC,0400h             ;1024 
 0001EA EDB0                A   223                LDIR                         ;Do th
                            A   224    
@@ -489,7 +489,7 @@ PC     Object              I  Line    Source
                            A   229                ;an psuedo random routine.  If that
                            A   230                ;cell to Alive.
 0001ED                     A   231    LOAD_RANDOM:
-0001ED 21 E2 01            A   232    			LD      HL,CURRSTART 
+0001ED 21 70 01            A   232    			LD      HL,CURRSTART 
 0001F0 0619                A   233                LD      B,ROWS 
 0001F2                     A   234    	COL:									;Co
 0001F2 C5                  A   235                PUSH    BC 
@@ -527,7 +527,7 @@ PC     Object              I  Line    Source
 000215 3E0C                A   267    			LD		A,12				;Clear 
 000217 5BD7                A   268    			RST.LIL	10h
                            A   269    			
-000219 DD21 E2 01          A   270    			LD      IX,CURRSTART 
+000219 DD21 70 01          A   270    			LD      IX,CURRSTART 
 00021D 0619                A   271    			LD		B,ROWS
 00021F                     A   272    	col_loop:
 00021F C5                  A   273    			PUSH	BC
@@ -590,79 +590,37 @@ PC     Object              I  Line    Source
                            A   330    ; initialised to a non zero value or this funct
                            A   331    ; zero. Also r_seed must be in RAM, you can see
 000263                     A   332    RAND_8:
-                           A   333    			;LD A,R
-                           A   334    			;ADD A, 1
-                           A   335    			;LD (r_seed), A
-                           A   336    
-000263 3A 75 02            A   337    			LD	A,(r_seed)	; get seed
-000266 E6B8                A   338    			AND	#B8h		; mask non feedback
-000268 37                  A   339    			SCF				; set carry
-000269 E2 6D 02            A   340    			JP	PO,no_clr	; skip clear if odd
-00026C 3F                  A   341    			CCF				; complement carry 
-00026D                     A   342    	no_clr:
-00026D 3A 75 02            A   343    			LD	A,(r_seed)	; get seed back
-000270 17                  A   344    			RLA				; rotate carry into
-000271 32 75 02            A   345    			LD	(r_seed),A	; save back for nex
-000274 C9                  A   346    			RET				; done
-000275                     A   347    	r_seed:
-000275 FE                  A   348    			DB	254			; prng seed byte (m
-                           A   349    	
-000276                     A   350    RAND_0:
-000276 DDE5                A   351    			push	IX
-000278 DD210000            A   352    			ld		IX,#0
-00027C DD39                A   353    			add		IX,SP
-00027E DD4E00              A   354    			ld		C,(ix)    ;get the Mask
-000281 3A F9 02            A   355    			ld		A,(_SEED)  ;get the Seed
-000284 47                  A   356    			ld		B,A	
-000285 ED5F                A   357    			ld		A,R  
-000287 80                  A   358    			add		A,B        ;add the value o
-000288 47                  A   359    			ld		B,A
-000289 ED5F                A   360    			ld		A,R
-00028B 07                  A   361    			rlca            ;rotation to the le
-00028C 90                  A   362    			sub		A,B        ;and subtracts i
-00028D 32 F9 02            A   363    			ld		(_SEED),A  ;save as Seed 
-000290 A1                  A   364    			and		C          ;apply the Mask
-000291 6F                  A   365    			ld		L,A        ;return L
-000292 DDE1                A   366    			pop		IX
-000294 C9                  A   367    			ret
-                           A   368    			
-000295                     A   369    _TEST:	
-000295 21 9D 02            A   370    			LD HL, s_RTC
-                           A   371    			MOSCALL mos_getrtc
-00029C C9                  A   372    			RET
-                           A   373    
-                           A   374    ; Text strings
-                           A   375    ;
-00029D 00                  A   376    s_RTC:		DB	0
-                           A   377    
-00029E 436F6E77 61792053   A   378    s_CONWAY1:	DB	"Conway Start\n\r", 0
-0002A6 74617274 0A0D00 
-0002AD 0A0D4761 6D65206F   A   379    s_LIFE:		DB 	"\n\rGame of Life\n\r", 0
-0002B5 66204C69 66650A0D 
-0002BD 00 
-0002BE 0A0D4C6F 61642052   A   380    s_LIFE1:	DB 	"\n\rLoad Random\n\r", 0
-0002C6 616E646F 6D0A0D00 
-0002CE 5072696E 74204365   A   381    s_LIFE2:	DB 	"Print Cells\n\r", 0
-0002D6 6C6C730A 0D00 
-0002DC 0A0D4669 6E697368   A   382    s_LIFE3:	DB 	"\n\rFinished\n\r", 0
-0002E4 65640A0D 00 
-0002E9 0A0D436F 6E776179   A   383    s_LIFE4:	DB 	"\n\rConway\n\r", 0
-0002F1 0A0D00 
-0002F4 0A0D00              A   384    s_cr_lf:	DB	"\n\r", 0
-0002F7 0D00                A   385    s_cr:		DB	"\r", 0
-                           A   386    
-                           A   387    
-0002F9 00                  A   388    _SEED:		DB
-                           A   389    	
-0002FA                     A   390    _MATRIX_START:
-                           A   391    	
-                           A   392    ; RAM
-                           A   393    ; 
-                           A   394    			DEFINE	LORAM, SPACE = ROM
-                           A   395    			SEGMENT LORAM
-                           A   396    			
+000263 3A 75 02            A   333    			LD	A,(r_seed)	; get seed
+000266 E6B8                A   334    			AND	#B8h		; mask non feedback
+000268 37                  A   335    			SCF				; set carry
+000269 E2 6D 02            A   336    			JP	PO,no_clr	; skip clear if odd
+00026C 3F                  A   337    			CCF				; complement carry 
+00026D                     A   338    	no_clr:
+00026D 3A 75 02            A   339    			LD	A,(r_seed)	; get seed back
+000270 17                  A   340    			RLA				; rotate carry into
+000271 32 75 02            A   341    			LD	(r_seed),A	; save back for nex
+000274 C9                  A   342    			RET				; done
+000275                     A   343    	r_seed:
+000275 FE                  A   344    			DB	254			; prng seed byte (m
+                           A   345    	
+                           A   346    
+                           A   347    ; Text strings
+                           A   348    ;
+000276 0A0D4669 6E697368   A   349    s_LIFE_END:	DB 	"\n\rFinished\n\r", 0
+00027E 65640A0D 00 
+000283 0A0D00              A   350    s_cr_lf:	DB	"\n\r", 0
+000286 0D00                A   351    s_cr:		DB	"\r", 0
+                           A   352    
+                           A   353    
+000288                     A   354    _MATRIX_START:
+                           A   355    	
+                           A   356    ; RAM
+                           A   357    ; 
+                           A   358    			DEFINE	LORAM, SPACE = ROM
+                           A   359    			SEGMENT LORAM
+                           A   360    			
 
 
 Errors: 0
 Warnings: 0
-Lines Assembled: 659
+Lines Assembled: 620

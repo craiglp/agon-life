@@ -62,4 +62,8 @@ Requires:
 MOS 1.03
 VDP 1.03
 
+Each generation is evaluated when you hit a key. Hitting Escape will exit.
+
+<<< Much more to come >>>
+
 
