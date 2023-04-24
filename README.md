@@ -1,6 +1,8 @@
 # Game of Life
 
 Conway's Game of Life for the Agon Light
+
+https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life
 -------------------------------------
 
  Based on the Amstrad CPC version written by Brian Chiha
