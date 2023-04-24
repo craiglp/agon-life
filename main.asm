@@ -54,7 +54,8 @@
             BOTTOM_RIGHT	EQU		COLS+2				; Look bottom right (+42 cells)
 
 
-;Calcuation for next cells are done from memeory #8000.  Current Base is what is displayed
+;Calcuation for next cells are done from memory starting at _MATRIC_START.  Current Base is 
+;what is displayed
 ;on the screen, Next Base is used to place the next life cycle.  Once all cells are check
 ;Next Base will be copied to Current Base
 ;

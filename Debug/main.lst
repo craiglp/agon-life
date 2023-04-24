@@ -1,4 +1,4 @@
-Zilog eZ80 Macro Assembler Version 4.3 (19073001) RELISTED23-Apr-23     21:57:26     page:   1
+Zilog eZ80 Macro Assembler Version 4.3 (19073001) RELISTED23-Apr-23     22:15:44     page:   1
 
 
 PC     Object              I  Line    Source 
@@ -314,354 +314,355 @@ PC     Object              I  Line    Source
        0000002A            A    54                BOTTOM_RIGHT	EQU		COLS+2		
                            A    55    
                            A    56    
-                           A    57    ;Calcuation for next cells are done from memeor
-                           A    58    ;on the screen, Next Base is used to place the 
-                           A    59    ;Next Base will be copied to Current Base
-                           A    60    ;
-                           A    61    ;To Work out top/bottom cells, I place a zero r
-                           A    62    ;handle left/right cells, I place one zero colu
-                           A    63    ;I have one extra byte.
-                           A    64    ;
-                           A    65    ;If Cell is alive it will be set to 1, if it is
-                           A    66    
-                           A    67    ; Memory Map With Upper/Lower/Left/Right buffer
-                           A    68    ; X = potential cell position, 0 = always zero
-                           A    69    ;   000102030405060708090A0B0C0D0E0F10111213141
-                           A    70    ;00  0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
-                           A    71    ;01  0 X X X X X X X X X X X X X X X X X X X X 
-                           A    72    ;02  0 X X X X X X X X X X X X X X X X X X X X 
-                           A    73    ;03  0 X X X X X X X X X X X X X X X X X X X X 
-                           A    74    ;04  0 X X X X X X X X X X X X X X X X X X X X 
-                           A    75    ;05  0 X X X X X X X X X X X X X X X X X X X X 
-                           A    76    ;06  0 X X X X X X X X X X X X X X X X X X X X 
-                           A    77    ;07  0 X X X X X X X X X X X X X X X X X X X X 
-                           A    78    ;08  0 X X X X X X X X X X X X X X X X X X X X 
-                           A    79    ;09  0 X X X X X X X X X X X X X X X X X X X X 
-                           A    80    ;0A  0 X X X X X X X X X X X X X X X X X X X X 
-                           A    81    ;0B  0 X X X X X X X X X X X X X X X X X X X X 
-                           A    82    ;0C  0 X X X X X X X X X X X X X X X X X X X X 
-                           A    83    ;0D  0 X X X X X X X X X X X X X X X X X X X X 
-                           A    84    ;0E  0 X X X X X X X X X X X X X X X X X X X X 
-                           A    85    ;0F  0 X X X X X X X X X X X X X X X X X X X X 
-                           A    86    ;10  0 X X X X X X X X X X X X X X X X X X X X 
-                           A    87    ;11  0 X X X X X X X X X X X X X X X X X X X X 
-                           A    88    ;12  0 X X X X X X X X X X X X X X X X X X X X 
-                           A    89    ;13  0 X X X X X X X X X X X X X X X X X X X X 
-                           A    90    ;14  0 X X X X X X X X X X X X X X X X X X X X 
-                           A    91    ;15  0 X X X X X X X X X X X X X X X X X X X X 
-                           A    92    ;16  0 X X X X X X X X X X X X X X X X X X X X 
-                           A    93    ;17  0 X X X X X X X X X X X X X X X X X X X X 
-                           A    94    ;18  0 X X X X X X X X X X X X X X X X X X X X 
-                           A    95    ;19  0 X X X X X X X X X X X X X X X X X X X X 
-                           A    96    ;1A  0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
-                           A    97    ;1B  0  <= needed for last bottom right check
-                           A    98    
+                           A    57    ;Calcuation for next cells are done from memory
+                           A    58    ;what is displayed
+                           A    59    ;on the screen, Next Base is used to place the 
+                           A    60    ;Next Base will be copied to Current Base
+                           A    61    ;
+                           A    62    ;To Work out top/bottom cells, I place a zero r
+                           A    63    ;handle left/right cells, I place one zero colu
+                           A    64    ;I have one extra byte.
+                           A    65    ;
+                           A    66    ;If Cell is alive it will be set to 1, if it is
+                           A    67    
+                           A    68    ; Memory Map With Upper/Lower/Left/Right buffer
+                           A    69    ; X = potential cell position, 0 = always zero
+                           A    70    ;   000102030405060708090A0B0C0D0E0F10111213141
+                           A    71    ;00  0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
+                           A    72    ;01  0 X X X X X X X X X X X X X X X X X X X X 
+                           A    73    ;02  0 X X X X X X X X X X X X X X X X X X X X 
+                           A    74    ;03  0 X X X X X X X X X X X X X X X X X X X X 
+                           A    75    ;04  0 X X X X X X X X X X X X X X X X X X X X 
+                           A    76    ;05  0 X X X X X X X X X X X X X X X X X X X X 
+                           A    77    ;06  0 X X X X X X X X X X X X X X X X X X X X 
+                           A    78    ;07  0 X X X X X X X X X X X X X X X X X X X X 
+                           A    79    ;08  0 X X X X X X X X X X X X X X X X X X X X 
+                           A    80    ;09  0 X X X X X X X X X X X X X X X X X X X X 
+                           A    81    ;0A  0 X X X X X X X X X X X X X X X X X X X X 
+                           A    82    ;0B  0 X X X X X X X X X X X X X X X X X X X X 
+                           A    83    ;0C  0 X X X X X X X X X X X X X X X X X X X X 
+                           A    84    ;0D  0 X X X X X X X X X X X X X X X X X X X X 
+                           A    85    ;0E  0 X X X X X X X X X X X X X X X X X X X X 
+                           A    86    ;0F  0 X X X X X X X X X X X X X X X X X X X X 
+                           A    87    ;10  0 X X X X X X X X X X X X X X X X X X X X 
+                           A    88    ;11  0 X X X X X X X X X X X X X X X X X X X X 
+                           A    89    ;12  0 X X X X X X X X X X X X X X X X X X X X 
+                           A    90    ;13  0 X X X X X X X X X X X X X X X X X X X X 
+                           A    91    ;14  0 X X X X X X X X X X X X X X X X X X X X 
+                           A    92    ;15  0 X X X X X X X X X X X X X X X X X X X X 
+                           A    93    ;16  0 X X X X X X X X X X X X X X X X X X X X 
+                           A    94    ;17  0 X X X X X X X X X X X X X X X X X X X X 
+                           A    95    ;18  0 X X X X X X X X X X X X X X X X X X X X 
+                           A    96    ;19  0 X X X X X X X X X X X X X X X X X X X X 
+                           A    97    ;1A  0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
+                           A    98    ;1B  0  <= needed for last bottom right check
                            A    99    
                            A   100    
-000142                     A   101    _main:		
-                           A   102    			;Set screen mode
-000142 3E16                A   103    			LD		A, 22		;VDU 22
-000144 5BD7                A   104    			RST.LIL	10h
-000146 3E00                A   105    			LD		A, SCRMODE	;Screen mode
-000148 5BD7                A   106    			RST.LIL	10h	
-                           A   107    			
-                           A   108    			;Disable text cursor
-00014A 3E17                A   109    			LD		A, 23		;VDU 23
-00014C 5BD7                A   110    			RST.LIL	10h
-00014E 3E01                A   111    			LD		A, 1
-000150 5BD7                A   112    			RST.LIL	10h			
-000152 3E00                A   113    			LD		A, 0
-000154 5BD7                A   114    			RST.LIL	10h			
-                           A   115    
-                           A   116    			;CALL	_TEST
-                           A   117    			;LD 		HL, _TEST
-                           A   118    			;CALL	Print_String
-000156                     A   119    START:
-000156 21 FA 02            A   120                LD      HL,CURRBASE     ;Clear Curr
-000159 11 FB 02            A   121                LD      DE,CURRBASE+1 
-00015C AF                  A   122                XOR     A               ;Set to Zer
-00015D 77                  A   123                LD      (HL),A 
-00015E 015D00              A   124                LD      BC,TOT_CELLS    ;Cells to b
-000161 EDB0                A   125                LDIR                    ;Do the Cop
-000163 21 A0 05            A   126                LD      HL,NEXTBASE     ;Clear Next
-000166 11 A1 05            A   127                LD      DE,NEXTBASE+1 
-000169 AF                  A   128                XOR     A               ;Set to Zer
-00016A 77                  A   129                LD      (HL),A 
-00016B 015D00              A   130                LD      BC,TOT_CELLS    ;1108 cells
-00016E EDB0                A   131                LDIR                    ;Do the Cop
-                           A   132    			
-000170                     A   133    NEWCELLS:            
-000170 CD ED 01            A   134                CALL    LOAD_RANDOM		;Initialize
-                           A   135    
-000173                     A   136    LIFE:
-000173 CD 15 02            A   137    			CALL	PRINT_CELLS
-                           A   138    			;CALL    DISPLAY_CELLS	;Fill scree
-                           A   139    			
-000176 CD 9E 01            A   140                CALL    CONWAY			;Do Conway 
-                           A   141    			
-                           A   142    			;Loop until key pressed			
-                           A   143    			MOSCALL	mos_getkey
-00017D B7                  A   144    			OR		A 		
-00017E 28 F3               A   145    			JR		Z, LIFE
-                           A   146    			
-000180 FE1B                A   147                CP      ESC				;Escape pre
-000182 20 EF               A   148                JR      NZ,LIFE			;Key presse
-                           A   149    
-000184 21 DC 02            A   150    			LD		HL, s_LIFE3		;Escape pre
-000187 010000              A   151    			LD		BC, 0
-00018A 3E00                A   152    			LD		A, 0
-00018C 49DF                A   153    			RST.LIS	18h
-                           A   154    											
-00018E                     A   155    	FINI:	
-                           A   156    			;Enable text cursor
-00018E 3E17                A   157    			LD		A, 23		;VDU 23
-000190 5BD7                A   158    			RST.LIL	10h
-000192 3E01                A   159    			LD		A, 1
-000194 5BD7                A   160    			RST.LIL	10h			
-000196 3E01                A   161    			LD		A, 1
-000198 5BD7                A   162    			RST.LIL	10h			
-                           A   163    
-00019A 210000              A   164    			LD		HL, 0			;Return, Er
-00019D C9                  A   165    			RET
-                           A   166    
-                           A   167                ;Update the matrix with Conway Rule
-                           A   168    			;The basic cell rules are:
-                           A   169    			;
-                           A   170    			;    * Any live cell with two or th
-                           A   171    			;    * Any dead cell with three liv
-                           A   172    			;    * All other live cells die in 
-00019E                     A   173    CONWAY:
-00019E DD21 E2 01          A   174                LD      IX,CURRSTART
-0001A2 21 CA 05            A   175                LD      HL,NEXTSTART
-0001A5 0619                A   176                LD      B,ROWS
-0001A7                     A   177    	NEWROW:              
-0001A7 C5                  A   178                PUSH    BC ;Save Registers
-0001A8 0628                A   179                LD      B,COLS ;40 Columns
-0001AA                     A   180    	NEWCOL:              
-                           A   181                ;Check the current cell and update 
-                           A   182                ;make checking easier
-0001AA DD7ED6              A   183                LD      A,(IX-UPPER_LEFT)          
-0001AD DD86D7              A   184                ADD     A,(IX-UPPER_MID)           
-0001B0 DD86D8              A   185                ADD     A,(IX-UPPER_RIGHT)         
-0001B3 DD86FF              A   186                ADD     A,(IX-MID_LEFT)            
-0001B6 DD8601              A   187                ADD     A,(IX+MID_RIGHT)           
-0001B9 DD8628              A   188                ADD     A,(IX+BOTTOM_LEFT)         
-0001BC DD8629              A   189                ADD     A,(IX+BOTTOM_MID)          
-0001BF DD862A              A   190                ADD     A,(IX+BOTTOM_RIGHT)        
-                           A   191    			
-0001C2                     A   192    		EVALUATE:       
-                           A   193                ;Evaluate surrounding cell count to
-                           A   194                ;This is the rules being applied fo
-0001C2 1601                A   195                LD      D,01h                ;Alive
-0001C4 FE03                A   196                CP      03h                  ;Check
-0001C6 28 0C               A   197                JR      Z,STOREC             ;Save 
-0001C8 1600                A   198                LD      D,00h                ;Dead
-0001CA FE02                A   199                CP      02h                  ;Check
-0001CC 20 06               A   200                JR      NZ,STOREC            ;Save 
-0001CE DD7E00              A   201                LD      A,(IX+0)             ;Curre
-0001D1 E601                A   202                AND     01h                  ;Keep 
-0001D3 57                  A   203                LD      D,A                  ;Load 
-                           A   204    			
-0001D4                     A   205    		STOREC:              
-                           A   206                ;Save the new cell to the Next Cell
-0001D4 7A                  A   207                LD      A,D                  ;D sto
-0001D5 77                  A   208                LD      (HL),A               ;Updat
-0001D6 23                  A   209                INC     HL                   ;Move 
-0001D7 DD23                A   210                INC     IX                   ;Move 
-0001D9 10 CF               A   211                DJNZ    NEWCOL               ;Repea
-                           A   212    
-0001DB 23                  A   213                INC     HL                   ;Skip 
-0001DC DD23                A   214                INC     IX                   ;Skip 
-0001DE C1                  A   215                POP     BC 
-0001DF 10 C6               A   216                DJNZ    NEWROW               ;Repea
-                           A   217    
-                           A   218                ;Copy next matrix to current
-0001E1 21 CA 05            A   219                LD      HL,NEXTSTART 
-0001E4 11 E2 01            A   220                LD      DE,CURRSTART 
-0001E7 010004              A   221                LD      BC,0400h             ;1024 
-0001EA EDB0                A   222                LDIR                         ;Do th
-                           A   223    
-0001EC C9                  A   224                RET                          ;Exit
-                           A   225    			
-                           A   226    
-                           A   227    			;Load Random cells in memory.  This
-                           A   228                ;an psuedo random routine.  If that
-                           A   229                ;cell to Alive.
-0001ED                     A   230    LOAD_RANDOM:
-0001ED 21 E2 01            A   231    			LD      HL,CURRSTART 
-0001F0 0619                A   232                LD      B,ROWS 
-0001F2                     A   233    	COL:									;Co
-0001F2 C5                  A   234                PUSH    BC 
-0001F3 0628                A   235                LD      B,COLS 
-0001F5                     A   236    	ROW:								;Rows
-0001F5 CD 63 02            A   237                CALL    RAND_8				;Call r
-0001F8 3E01                A   238                LD      A,01h				;Defaul
-0001FA 38 01               A   239                JR      C,STORECELL 
-0001FC AF                  A   240                XOR     A					;Set to
-0001FD                     A   241    	STORECELL:           
-0001FD 77                  A   242                LD      (HL),A				;Store 
-0001FE 23                  A   243                INC     HL 
-0001FF 10 F4               A   244                DJNZ    ROW 
-000201 23                  A   245                INC     HL					;Skip l
-000202 C1                  A   246                POP     BC 
-000203 10 ED               A   247                DJNZ    COL 
-000205 C9                  A   248                RET							;Exit
-                           A   249    
-                           A   250                ;Random boolean value.  Carry flag 
-000206                     A   251    	RAND:                
-000206 C5                  A   252                PUSH    BC 
-000207 ED5F                A   253                LD      A,R                  ;Rando
-000209 47                  A   254                LD      B,A 
-00020A 0F                  A   255                RRCA                         ;Multi
-00020B 0F                  A   256                RRCA     
-00020C 0F                  A   257                RRCA     
-00020D EE1F                A   258                XOR     1Fh 
-00020F 80                  A   259                ADD     A,B 
-000210 DEFF                A   260                SBC     A,FFh 
-000212 C1                  A   261                POP     BC 
-000213 0F                  A   262                RRCA                         ;Check
-000214 C9                  A   263                RET      
-                           A   264    
-000215                     A   265    PRINT_CELLS:
-000215 3E0C                A   266    			LD		A,12				;Clear 
-000217 5BD7                A   267    			RST.LIL	10h
-                           A   268    			
-000219 DD21 E2 01          A   269    			LD      IX,CURRSTART 
-00021D 0619                A   270    			LD		B,ROWS
-00021F                     A   271    	col_loop:
-00021F C5                  A   272    			PUSH	BC
-000220 0628                A   273    			LD		B,COLS
-000222                     A   274    	row_loop:
-000222 DD7E00              A   275    			LD		A,(IX)
-000225 CD 3A 02            A   276    			CALL	Print_Cell
-                           A   277    			
-000228 DD23                A   278    			INC		IX
-00022A 10 F6               A   279    			DJNZ	row_loop
-                           A   280    
-                           A   281    			;Print CR/LF after each row
-00022C 57                  A   282    			LD		D, A
-00022D 3E0D                A   283    			LD		A, 0Dh
-00022F 49D7                A   284    			RST.LIS	10h
-000231 3E0A                A   285    			LD		A, 0Ah
-000233 49D7                A   286    			RST.LIS	10h
-000235 7A                  A   287    			LD		A, D
-                           A   288    			
-000236 C1                  A   289    			POP		BC
-000237 10 E6               A   290    			DJNZ	col_loop
-000239 C9                  A   291    			RET							;Exit
-                           A   292    
-00023A                     A   293    Print_Cell:
-00023A 4F                  A   294    			LD C,A
-00023B FE01                A   295    			CP 01h
-00023D 3E20                A   296    			LD A, 20h
-00023F 20 02               A   297    			JR NZ,PZ
-000241 3E31                A   298    			LD A, 31h
-000243 49D7                A   299    	PZ:		RST.LIS 10h
-000245 79                  A   300    			LD A,C
-000246 C9                  A   301    			RET
-                           A   302    			
-000247                     A   303    Print_String:
-000247 010000              A   304    			LD		BC, 0
-00024A 3E00                A   305    			LD		A, 0
-00024C 49DF                A   306    			RST.LIS	18h
-00024E C9                  A   307    			RET
-                           A   308    
-                           A   309    ; Print an 8-bit HEX number
-                           A   310    ; A: Number to print
-00024F                     A   311    Print_Hex8:
-00024F 4F                  A   312    			LD		C,A
-000250 1F                  A   313    			RRA 
-000251 1F                  A   314    			RRA 
-000252 1F                  A   315    			RRA 
-000253 1F                  A   316    			RRA 
-000254 CD 58 02            A   317    			CALL	$F 
-000257 79                  A   318    			LD		A,C 
-000258 E60F                A   319    $$:			AND		0Fh
-00025A C690                A   320    			ADD		A,90h
-00025C 27                  A   321    			DAA
-00025D CE40                A   322    			ADC		A,40h
-00025F 27                  A   323    			DAA
-000260 49D7                A   324    			RST.LIS	10h
-000262 C9                  A   325    			RET
-                           A   326    			
-                           A   327    ; returns pseudo random 8 bit number in A. Only
-                           A   328    ; (r_seed) is the byte from which the number is
-                           A   329    ; initialised to a non zero value or this funct
-                           A   330    ; zero. Also r_seed must be in RAM, you can see
-000263                     A   331    RAND_8:
-                           A   332    			;LD A,R
-                           A   333    			;ADD A, 1
-                           A   334    			;LD (r_seed), A
-                           A   335    
-000263 3A 75 02            A   336    			LD	A,(r_seed)	; get seed
-000266 E6B8                A   337    			AND	#B8h		; mask non feedback
-000268 37                  A   338    			SCF				; set carry
-000269 E2 6D 02            A   339    			JP	PO,no_clr	; skip clear if odd
-00026C 3F                  A   340    			CCF				; complement carry 
-00026D                     A   341    	no_clr:
-00026D 3A 75 02            A   342    			LD	A,(r_seed)	; get seed back
-000270 17                  A   343    			RLA				; rotate carry into
-000271 32 75 02            A   344    			LD	(r_seed),A	; save back for nex
-000274 C9                  A   345    			RET				; done
-000275                     A   346    	r_seed:
-000275 FE                  A   347    			DB	254			; prng seed byte (m
-                           A   348    	
-000276                     A   349    RAND_0:
-000276 DDE5                A   350    			push	IX
-000278 DD210000            A   351    			ld		IX,#0
-00027C DD39                A   352    			add		IX,SP
-00027E DD4E00              A   353    			ld		C,(ix)    ;get the Mask
-000281 3A F9 02            A   354    			ld		A,(_SEED)  ;get the Seed
-000284 47                  A   355    			ld		B,A	
-000285 ED5F                A   356    			ld		A,R  
-000287 80                  A   357    			add		A,B        ;add the value o
-000288 47                  A   358    			ld		B,A
-000289 ED5F                A   359    			ld		A,R
-00028B 07                  A   360    			rlca            ;rotation to the le
-00028C 90                  A   361    			sub		A,B        ;and subtracts i
-00028D 32 F9 02            A   362    			ld		(_SEED),A  ;save as Seed 
-000290 A1                  A   363    			and		C          ;apply the Mask
-000291 6F                  A   364    			ld		L,A        ;return L
-000292 DDE1                A   365    			pop		IX
-000294 C9                  A   366    			ret
-                           A   367    			
-000295                     A   368    _TEST:	
-000295 21 9D 02            A   369    			LD HL, s_RTC
-                           A   370    			MOSCALL mos_getrtc
-00029C C9                  A   371    			RET
-                           A   372    
-                           A   373    ; Text strings
-                           A   374    ;
-00029D 00                  A   375    s_RTC:		DB	0
-                           A   376    
-00029E 436F6E77 61792053   A   377    s_CONWAY1:	DB	"Conway Start\n\r", 0
+                           A   101    
+000142                     A   102    _main:		
+                           A   103    			;Set screen mode
+000142 3E16                A   104    			LD		A, 22		;VDU 22
+000144 5BD7                A   105    			RST.LIL	10h
+000146 3E00                A   106    			LD		A, SCRMODE	;Screen mode
+000148 5BD7                A   107    			RST.LIL	10h	
+                           A   108    			
+                           A   109    			;Disable text cursor
+00014A 3E17                A   110    			LD		A, 23		;VDU 23
+00014C 5BD7                A   111    			RST.LIL	10h
+00014E 3E01                A   112    			LD		A, 1
+000150 5BD7                A   113    			RST.LIL	10h			
+000152 3E00                A   114    			LD		A, 0
+000154 5BD7                A   115    			RST.LIL	10h			
+                           A   116    
+                           A   117    			;CALL	_TEST
+                           A   118    			;LD 		HL, _TEST
+                           A   119    			;CALL	Print_String
+000156                     A   120    START:
+000156 21 FA 02            A   121                LD      HL,CURRBASE     ;Clear Curr
+000159 11 FB 02            A   122                LD      DE,CURRBASE+1 
+00015C AF                  A   123                XOR     A               ;Set to Zer
+00015D 77                  A   124                LD      (HL),A 
+00015E 015D00              A   125                LD      BC,TOT_CELLS    ;Cells to b
+000161 EDB0                A   126                LDIR                    ;Do the Cop
+000163 21 A0 05            A   127                LD      HL,NEXTBASE     ;Clear Next
+000166 11 A1 05            A   128                LD      DE,NEXTBASE+1 
+000169 AF                  A   129                XOR     A               ;Set to Zer
+00016A 77                  A   130                LD      (HL),A 
+00016B 015D00              A   131                LD      BC,TOT_CELLS    ;1108 cells
+00016E EDB0                A   132                LDIR                    ;Do the Cop
+                           A   133    			
+000170                     A   134    NEWCELLS:            
+000170 CD ED 01            A   135                CALL    LOAD_RANDOM		;Initialize
+                           A   136    
+000173                     A   137    LIFE:
+000173 CD 15 02            A   138    			CALL	PRINT_CELLS
+                           A   139    			;CALL    DISPLAY_CELLS	;Fill scree
+                           A   140    			
+000176 CD 9E 01            A   141                CALL    CONWAY			;Do Conway 
+                           A   142    			
+                           A   143    			;Loop until key pressed			
+                           A   144    			MOSCALL	mos_getkey
+00017D B7                  A   145    			OR		A 		
+00017E 28 F3               A   146    			JR		Z, LIFE
+                           A   147    			
+000180 FE1B                A   148                CP      ESC				;Escape pre
+000182 20 EF               A   149                JR      NZ,LIFE			;Key presse
+                           A   150    
+000184 21 DC 02            A   151    			LD		HL, s_LIFE3		;Escape pre
+000187 010000              A   152    			LD		BC, 0
+00018A 3E00                A   153    			LD		A, 0
+00018C 49DF                A   154    			RST.LIS	18h
+                           A   155    											
+00018E                     A   156    	FINI:	
+                           A   157    			;Enable text cursor
+00018E 3E17                A   158    			LD		A, 23		;VDU 23
+000190 5BD7                A   159    			RST.LIL	10h
+000192 3E01                A   160    			LD		A, 1
+000194 5BD7                A   161    			RST.LIL	10h			
+000196 3E01                A   162    			LD		A, 1
+000198 5BD7                A   163    			RST.LIL	10h			
+                           A   164    
+00019A 210000              A   165    			LD		HL, 0			;Return, Er
+00019D C9                  A   166    			RET
+                           A   167    
+                           A   168                ;Update the matrix with Conway Rule
+                           A   169    			;The basic cell rules are:
+                           A   170    			;
+                           A   171    			;    * Any live cell with two or th
+                           A   172    			;    * Any dead cell with three liv
+                           A   173    			;    * All other live cells die in 
+00019E                     A   174    CONWAY:
+00019E DD21 E2 01          A   175                LD      IX,CURRSTART
+0001A2 21 CA 05            A   176                LD      HL,NEXTSTART
+0001A5 0619                A   177                LD      B,ROWS
+0001A7                     A   178    	NEWROW:              
+0001A7 C5                  A   179                PUSH    BC ;Save Registers
+0001A8 0628                A   180                LD      B,COLS ;40 Columns
+0001AA                     A   181    	NEWCOL:              
+                           A   182                ;Check the current cell and update 
+                           A   183                ;make checking easier
+0001AA DD7ED6              A   184                LD      A,(IX-UPPER_LEFT)          
+0001AD DD86D7              A   185                ADD     A,(IX-UPPER_MID)           
+0001B0 DD86D8              A   186                ADD     A,(IX-UPPER_RIGHT)         
+0001B3 DD86FF              A   187                ADD     A,(IX-MID_LEFT)            
+0001B6 DD8601              A   188                ADD     A,(IX+MID_RIGHT)           
+0001B9 DD8628              A   189                ADD     A,(IX+BOTTOM_LEFT)         
+0001BC DD8629              A   190                ADD     A,(IX+BOTTOM_MID)          
+0001BF DD862A              A   191                ADD     A,(IX+BOTTOM_RIGHT)        
+                           A   192    			
+0001C2                     A   193    		EVALUATE:       
+                           A   194                ;Evaluate surrounding cell count to
+                           A   195                ;This is the rules being applied fo
+0001C2 1601                A   196                LD      D,01h                ;Alive
+0001C4 FE03                A   197                CP      03h                  ;Check
+0001C6 28 0C               A   198                JR      Z,STOREC             ;Save 
+0001C8 1600                A   199                LD      D,00h                ;Dead
+0001CA FE02                A   200                CP      02h                  ;Check
+0001CC 20 06               A   201                JR      NZ,STOREC            ;Save 
+0001CE DD7E00              A   202                LD      A,(IX+0)             ;Curre
+0001D1 E601                A   203                AND     01h                  ;Keep 
+0001D3 57                  A   204                LD      D,A                  ;Load 
+                           A   205    			
+0001D4                     A   206    		STOREC:              
+                           A   207                ;Save the new cell to the Next Cell
+0001D4 7A                  A   208                LD      A,D                  ;D sto
+0001D5 77                  A   209                LD      (HL),A               ;Updat
+0001D6 23                  A   210                INC     HL                   ;Move 
+0001D7 DD23                A   211                INC     IX                   ;Move 
+0001D9 10 CF               A   212                DJNZ    NEWCOL               ;Repea
+                           A   213    
+0001DB 23                  A   214                INC     HL                   ;Skip 
+0001DC DD23                A   215                INC     IX                   ;Skip 
+0001DE C1                  A   216                POP     BC 
+0001DF 10 C6               A   217                DJNZ    NEWROW               ;Repea
+                           A   218    
+                           A   219                ;Copy next matrix to current
+0001E1 21 CA 05            A   220                LD      HL,NEXTSTART 
+0001E4 11 E2 01            A   221                LD      DE,CURRSTART 
+0001E7 010004              A   222                LD      BC,0400h             ;1024 
+0001EA EDB0                A   223                LDIR                         ;Do th
+                           A   224    
+0001EC C9                  A   225                RET                          ;Exit
+                           A   226    			
+                           A   227    
+                           A   228    			;Load Random cells in memory.  This
+                           A   229                ;an psuedo random routine.  If that
+                           A   230                ;cell to Alive.
+0001ED                     A   231    LOAD_RANDOM:
+0001ED 21 E2 01            A   232    			LD      HL,CURRSTART 
+0001F0 0619                A   233                LD      B,ROWS 
+0001F2                     A   234    	COL:									;Co
+0001F2 C5                  A   235                PUSH    BC 
+0001F3 0628                A   236                LD      B,COLS 
+0001F5                     A   237    	ROW:								;Rows
+0001F5 CD 63 02            A   238                CALL    RAND_8				;Call r
+0001F8 3E01                A   239                LD      A,01h				;Defaul
+0001FA 38 01               A   240                JR      C,STORECELL 
+0001FC AF                  A   241                XOR     A					;Set to
+0001FD                     A   242    	STORECELL:           
+0001FD 77                  A   243                LD      (HL),A				;Store 
+0001FE 23                  A   244                INC     HL 
+0001FF 10 F4               A   245                DJNZ    ROW 
+000201 23                  A   246                INC     HL					;Skip l
+000202 C1                  A   247                POP     BC 
+000203 10 ED               A   248                DJNZ    COL 
+000205 C9                  A   249                RET							;Exit
+                           A   250    
+                           A   251                ;Random boolean value.  Carry flag 
+000206                     A   252    	RAND:                
+000206 C5                  A   253                PUSH    BC 
+000207 ED5F                A   254                LD      A,R                  ;Rando
+000209 47                  A   255                LD      B,A 
+00020A 0F                  A   256                RRCA                         ;Multi
+00020B 0F                  A   257                RRCA     
+00020C 0F                  A   258                RRCA     
+00020D EE1F                A   259                XOR     1Fh 
+00020F 80                  A   260                ADD     A,B 
+000210 DEFF                A   261                SBC     A,FFh 
+000212 C1                  A   262                POP     BC 
+000213 0F                  A   263                RRCA                         ;Check
+000214 C9                  A   264                RET      
+                           A   265    
+000215                     A   266    PRINT_CELLS:
+000215 3E0C                A   267    			LD		A,12				;Clear 
+000217 5BD7                A   268    			RST.LIL	10h
+                           A   269    			
+000219 DD21 E2 01          A   270    			LD      IX,CURRSTART 
+00021D 0619                A   271    			LD		B,ROWS
+00021F                     A   272    	col_loop:
+00021F C5                  A   273    			PUSH	BC
+000220 0628                A   274    			LD		B,COLS
+000222                     A   275    	row_loop:
+000222 DD7E00              A   276    			LD		A,(IX)
+000225 CD 3A 02            A   277    			CALL	Print_Cell
+                           A   278    			
+000228 DD23                A   279    			INC		IX
+00022A 10 F6               A   280    			DJNZ	row_loop
+                           A   281    
+                           A   282    			;Print CR/LF after each row
+00022C 57                  A   283    			LD		D, A
+00022D 3E0D                A   284    			LD		A, 0Dh
+00022F 49D7                A   285    			RST.LIS	10h
+000231 3E0A                A   286    			LD		A, 0Ah
+000233 49D7                A   287    			RST.LIS	10h
+000235 7A                  A   288    			LD		A, D
+                           A   289    			
+000236 C1                  A   290    			POP		BC
+000237 10 E6               A   291    			DJNZ	col_loop
+000239 C9                  A   292    			RET							;Exit
+                           A   293    
+00023A                     A   294    Print_Cell:
+00023A 4F                  A   295    			LD C,A
+00023B FE01                A   296    			CP 01h
+00023D 3E20                A   297    			LD A, 20h
+00023F 20 02               A   298    			JR NZ,PZ
+000241 3E31                A   299    			LD A, 31h
+000243 49D7                A   300    	PZ:		RST.LIS 10h
+000245 79                  A   301    			LD A,C
+000246 C9                  A   302    			RET
+                           A   303    			
+000247                     A   304    Print_String:
+000247 010000              A   305    			LD		BC, 0
+00024A 3E00                A   306    			LD		A, 0
+00024C 49DF                A   307    			RST.LIS	18h
+00024E C9                  A   308    			RET
+                           A   309    
+                           A   310    ; Print an 8-bit HEX number
+                           A   311    ; A: Number to print
+00024F                     A   312    Print_Hex8:
+00024F 4F                  A   313    			LD		C,A
+000250 1F                  A   314    			RRA 
+000251 1F                  A   315    			RRA 
+000252 1F                  A   316    			RRA 
+000253 1F                  A   317    			RRA 
+000254 CD 58 02            A   318    			CALL	$F 
+000257 79                  A   319    			LD		A,C 
+000258 E60F                A   320    $$:			AND		0Fh
+00025A C690                A   321    			ADD		A,90h
+00025C 27                  A   322    			DAA
+00025D CE40                A   323    			ADC		A,40h
+00025F 27                  A   324    			DAA
+000260 49D7                A   325    			RST.LIS	10h
+000262 C9                  A   326    			RET
+                           A   327    			
+                           A   328    ; returns pseudo random 8 bit number in A. Only
+                           A   329    ; (r_seed) is the byte from which the number is
+                           A   330    ; initialised to a non zero value or this funct
+                           A   331    ; zero. Also r_seed must be in RAM, you can see
+000263                     A   332    RAND_8:
+                           A   333    			;LD A,R
+                           A   334    			;ADD A, 1
+                           A   335    			;LD (r_seed), A
+                           A   336    
+000263 3A 75 02            A   337    			LD	A,(r_seed)	; get seed
+000266 E6B8                A   338    			AND	#B8h		; mask non feedback
+000268 37                  A   339    			SCF				; set carry
+000269 E2 6D 02            A   340    			JP	PO,no_clr	; skip clear if odd
+00026C 3F                  A   341    			CCF				; complement carry 
+00026D                     A   342    	no_clr:
+00026D 3A 75 02            A   343    			LD	A,(r_seed)	; get seed back
+000270 17                  A   344    			RLA				; rotate carry into
+000271 32 75 02            A   345    			LD	(r_seed),A	; save back for nex
+000274 C9                  A   346    			RET				; done
+000275                     A   347    	r_seed:
+000275 FE                  A   348    			DB	254			; prng seed byte (m
+                           A   349    	
+000276                     A   350    RAND_0:
+000276 DDE5                A   351    			push	IX
+000278 DD210000            A   352    			ld		IX,#0
+00027C DD39                A   353    			add		IX,SP
+00027E DD4E00              A   354    			ld		C,(ix)    ;get the Mask
+000281 3A F9 02            A   355    			ld		A,(_SEED)  ;get the Seed
+000284 47                  A   356    			ld		B,A	
+000285 ED5F                A   357    			ld		A,R  
+000287 80                  A   358    			add		A,B        ;add the value o
+000288 47                  A   359    			ld		B,A
+000289 ED5F                A   360    			ld		A,R
+00028B 07                  A   361    			rlca            ;rotation to the le
+00028C 90                  A   362    			sub		A,B        ;and subtracts i
+00028D 32 F9 02            A   363    			ld		(_SEED),A  ;save as Seed 
+000290 A1                  A   364    			and		C          ;apply the Mask
+000291 6F                  A   365    			ld		L,A        ;return L
+000292 DDE1                A   366    			pop		IX
+000294 C9                  A   367    			ret
+                           A   368    			
+000295                     A   369    _TEST:	
+000295 21 9D 02            A   370    			LD HL, s_RTC
+                           A   371    			MOSCALL mos_getrtc
+00029C C9                  A   372    			RET
+                           A   373    
+                           A   374    ; Text strings
+                           A   375    ;
+00029D 00                  A   376    s_RTC:		DB	0
+                           A   377    
+00029E 436F6E77 61792053   A   378    s_CONWAY1:	DB	"Conway Start\n\r", 0
 0002A6 74617274 0A0D00 
-0002AD 0A0D4761 6D65206F   A   378    s_LIFE:		DB 	"\n\rGame of Life\n\r", 0
+0002AD 0A0D4761 6D65206F   A   379    s_LIFE:		DB 	"\n\rGame of Life\n\r", 0
 0002B5 66204C69 66650A0D 
 0002BD 00 
-0002BE 0A0D4C6F 61642052   A   379    s_LIFE1:	DB 	"\n\rLoad Random\n\r", 0
+0002BE 0A0D4C6F 61642052   A   380    s_LIFE1:	DB 	"\n\rLoad Random\n\r", 0
 0002C6 616E646F 6D0A0D00 
-0002CE 5072696E 74204365   A   380    s_LIFE2:	DB 	"Print Cells\n\r", 0
+0002CE 5072696E 74204365   A   381    s_LIFE2:	DB 	"Print Cells\n\r", 0
 0002D6 6C6C730A 0D00 
-0002DC 0A0D4669 6E697368   A   381    s_LIFE3:	DB 	"\n\rFinished\n\r", 0
+0002DC 0A0D4669 6E697368   A   382    s_LIFE3:	DB 	"\n\rFinished\n\r", 0
 0002E4 65640A0D 00 
-0002E9 0A0D436F 6E776179   A   382    s_LIFE4:	DB 	"\n\rConway\n\r", 0
+0002E9 0A0D436F 6E776179   A   383    s_LIFE4:	DB 	"\n\rConway\n\r", 0
 0002F1 0A0D00 
-0002F4 0A0D00              A   383    s_cr_lf:	DB	"\n\r", 0
-0002F7 0D00                A   384    s_cr:		DB	"\r", 0
-                           A   385    
+0002F4 0A0D00              A   384    s_cr_lf:	DB	"\n\r", 0
+0002F7 0D00                A   385    s_cr:		DB	"\r", 0
                            A   386    
-0002F9 00                  A   387    _SEED:		DB
-                           A   388    	
-0002FA                     A   389    _MATRIX_START:
-                           A   390    	
-                           A   391    ; RAM
-                           A   392    ; 
-                           A   393    			DEFINE	LORAM, SPACE = ROM
-                           A   394    			SEGMENT LORAM
-                           A   395    			
+                           A   387    
+0002F9 00                  A   388    _SEED:		DB
+                           A   389    	
+0002FA                     A   390    _MATRIX_START:
+                           A   391    	
+                           A   392    ; RAM
+                           A   393    ; 
+                           A   394    			DEFINE	LORAM, SPACE = ROM
+                           A   395    			SEGMENT LORAM
+                           A   396    			
 
 
 Errors: 0
 Warnings: 0
-Lines Assembled: 658
+Lines Assembled: 659
