@@ -4,7 +4,7 @@ Copyright (C) 1999-2008 Zilog, Inc. All Rights Reserved
 
 LINK MAP:
 
-DATE:      Sun Apr 23 22:21:52 2023
+DATE:      Mon Apr 24 21:25:25 2023
 PROCESSOR: assembler
 FILES:     .\init.obj             .\main.obj             .\output.obj           
 
@@ -71,10 +71,10 @@ SPACE ALLOCATION:
 
 Space                     Base         Top      Size      Used    Unused
 ------------------ ----------- ----------- --------- --------- ---------
-RAM                   D:040000    D:04033B    80000H      33CH    7FCC4H
-                                          (   524288       828    523460)
-ROM                   C:000000    C:00033B    20000H      33CH    1FCC4H
-                                          (   131072       828    130244)
+RAM                   D:040000    D:04034B    80000H      34CH    7FCB4H
+                                          (   524288       844    523444)
+ROM                   C:000000    C:00034B    20000H      34CH    1FCB4H
+                                          (   131072       844    130228)
 
 
 SEGMENTS WITHIN SPACE:
@@ -83,18 +83,18 @@ SEGMENTS WITHIN SPACE:
 RAM                               Type        Base         Top      Size
 ------------------ ------------------- ----------- ----------- ---------
 __VECTORS          * segment copy *       D:040000    D:040044       45h
-CODE               * segment copy *       D:040045    D:04033B      2f7h
+CODE               * segment copy *       D:040045    D:04034B      307h
 
 
 ROM                               Type        Base         Top      Size
 ------------------ ------------------- ----------- ----------- ---------
 __VECTORS          normal data            C:000000    C:000044       45h
-CODE               normal data            C:000045    C:00033B      2f7h
+CODE               normal data            C:000045    C:00034B      307h
 
 SEGMENTS WITHIN MODULES:
 ========================
 
-Module: C:\Users\craig\AgonLight\asm\Game of Life\init.asm (File: init.obj) Version: 1:0 04/23/2023 22:21:52
+Module: C:\Users\craig\AgonLight\asm\Game of Life\init.asm (File: init.obj) Version: 1:0 04/24/2023 21:25:25
 
     Name                                           Base         Top      Size
     --------------------------------------- ----------- ----------- ---------
@@ -102,18 +102,18 @@ Module: C:\Users\craig\AgonLight\asm\Game of Life\init.asm (File: init.obj) Vers
     Segment: CODE                              C:000045    C:000141       fdh
 
 
-Module: C:\Users\craig\AgonLight\asm\Game of Life\main.asm (File: main.obj) Version: 1:0 04/23/2023 22:21:52
+Module: C:\Users\craig\AgonLight\asm\Game of Life\main.asm (File: main.obj) Version: 1:0 04/24/2023 21:25:25
 
     Name                                           Base         Top      Size
     --------------------------------------- ----------- ----------- ---------
-    Segment: CODE                              C:000142    C:000287      146h
+    Segment: CODE                              C:000142    C:000297      156h
 
 
-Module: C:\Users\craig\AgonLight\asm\Game of Life\output.asm (File: output.obj) Version: 1:0 04/23/2023 22:21:52
+Module: C:\Users\craig\AgonLight\asm\Game of Life\output.asm (File: output.obj) Version: 1:0 04/24/2023 21:25:25
 
     Name                                           Base         Top      Size
     --------------------------------------- ----------- ----------- ---------
-    Segment: CODE                              C:000288    C:00033B       b4h
+    Segment: CODE                              C:000298    C:00034B       b4h
 
 EXTERNAL DEFINITIONS:
 =====================
@@ -143,13 +143,13 @@ __RAM_ADDR_U_INIT_PARAM             000000FF (User Defined)
 __RAM_CTL_INIT_PARAM                00000080 (User Defined)
 _main                               C:000142 main            CODE                            
 _SYS_CLK_FREQ                       01194000 (User Defined)
-Inverse_Video                       C:0002E9 output          CODE                            
-Print_CRLF                          C:0002DD output          CODE                            
-Print_CString                       C:0002CE output          CODE                            
-Print_Decimal                       C:000288 output          CODE                            
-Print_String                        C:0002E1 output          CODE                            
-Setup_Screen                        C:0002F5 output          CODE                            
-True_Video                          C:0002EF output          CODE                            
+Inverse_Video                       C:0002F9 output          CODE                            
+Print_CRLF                          C:0002ED output          CODE                            
+Print_CString                       C:0002DE output          CODE                            
+Print_Decimal                       C:000298 output          CODE                            
+Print_String                        C:0002F1 output          CODE                            
+Setup_Screen                        C:000305 output          CODE                            
+True_Video                          C:0002FF output          CODE                            
 
 30 external symbol(s).
 
@@ -191,8 +191,8 @@ True_Video                        Defined     C:\Users\craig\AgonLight\asm\Game 
 
 OUTPUT CHECKSUM
 ===============
-life.hex             012608
-life.lod             012608
+life.hex             012F00
+life.lod             012F00
 
 
 

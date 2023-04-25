@@ -32,17 +32,17 @@
 						
 			XDEF	_main
 			
-			SCRMODE		EQU		0h				  		;Screen Mode 3
+			SCRMODE		EQU		3h				  		;Screen Mode 3
 			ROWS        EQU     25                		;25 Rows on screen
 			COLS        EQU     40                		;40 Columns on screen
 			
+			TOT_CELLS	EQU		(ROWS+2)*(COLS+1)+1		;Total number of cells
+
 			CURRBASE    EQU     _MATRIX_START      		;Base address of Cell primary cell table
 			CURRSTART   EQU     CURRBASE+COLS+2   		;Primary start position Base+42
 
-			NEXTBASE    EQU     CURRBASE+(ROWS * COLS)	;Base address of Cell secondary cell table
+			NEXTBASE    EQU     CURRBASE+TOT_CELLS+1	;Base address of Cell secondary cell table
 			NEXTSTART   EQU     NEXTBASE+COLS+2   		;Secondary start position Base+COLS+2
-			
-			TOT_CELLS	EQU		(ROWS * 2) + COLS + 3	;Total number of cells
 			
             UPPER_LEFT		EQU		COLS+2				; Look upper left (-42 cells)
             UPPER_MID		EQU		COLS+1				; Look upper mid (-41 cells)
@@ -54,18 +54,13 @@
             BOTTOM_RIGHT	EQU		COLS+2				; Look bottom right (+42 cells)
 
 
-;Calcuation for next cells are done from memory starting at _MATRIC_START.  Current Base is 
-;what is displayed
-;on the screen, Next Base is used to place the next life cycle.  Once all cells are check
-;Next Base will be copied to Current Base
-;
-;To Work out top/bottom cells, I place a zero row one above and below the 1000 cell table.  To
-;handle left/right cells, I place one zero column on the left.  And for the bottom right cell
+;To work out top/bottom cells, I place a zero row one above and below the 1000 cell table. To
+;handle left/right cells, I place one zero column on the left. And for the bottom right cell
 ;I have one extra byte.
 ;
 ;If Cell is alive it will be set to 1, if it is dead, it will be zero.
 
-; Memory Map With Upper/Lower/Left/Right buffer.  Total of 1108 Bytes
+; Memory Map With Upper/Lower/Left/Right buffer.  Total of 1108 Bytes for 40x25 matrix
 ; X = potential cell position, 0 = always zero
 ;   000102030405060708090A0B0C0D0E0F101112131415161718191A1B1C1D1E1F202122232425262728
 ;00  0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
@@ -113,10 +108,10 @@ _main:
 			RST.LIL	10h			
 			LD		A, 0
 			RST.LIL	10h			
+			
+			LD		HL, s_CELL_CHAR
+			CALL	Print_String
 
-			;CALL	_TEST
-			;LD 		HL, _TEST
-			;CALL	Print_String
 START:
             LD      HL,CURRBASE     ;Clear Current Cell data location to be all zeros
             LD      DE,CURRBASE+1 
@@ -296,7 +291,7 @@ Print_Cell:
 			CP 01h
 			LD A, 20h
 			JR NZ,PZ
-			LD A, 31h
+			LD A, 130
 	PZ:		RST.LIS 10h
 			LD A,C
 			RET
@@ -344,12 +339,14 @@ RAND_8:
 			DB	254			; prng seed byte (must not be zero)
 	
 
+
 ; Text strings
 ;
 s_LIFE_END:	DB 	"\n\rFinished\n\r", 0
 s_cr_lf:	DB	"\n\r", 0
 s_cr:		DB	"\r", 0
 
+s_CELL_CHAR DB 23,130,3Ch,7Eh,FFh,FFh,FFh,FFh,7Eh,3Ch
 
 _MATRIX_START:
 	

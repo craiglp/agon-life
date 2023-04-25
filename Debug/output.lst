@@ -1,4 +1,4 @@
-Zilog eZ80 Macro Assembler Version 4.3 (19073001) RELISTED23-Apr-23     22:21:52     page:   1
+Zilog eZ80 Macro Assembler Version 4.3 (19073001) RELISTED24-Apr-23     21:25:25     page:   1
 
 
 PC     Object              I  Line    Source 
@@ -280,113 +280,113 @@ PC     Object              I  Line    Source
                            A    20    			XDEF	True_Video
                            A    21    			
                            A    22    
-000288                     A    23    Print_Decimal:	
+000298                     A    23    Print_Decimal:	
                            A    24    ; Print a decimal number (less than 1000000)';
                            A    25    ;
                            A    26    ; Input: HL 24-bit number to print.
-000288 FDE5                A    27    			PUSH	IY
-00028A D5                  A    28    			PUSH	DE
-00028B C5                  A    29    			PUSH 	BC
-00028C FD21 B6 02 00       A    30    			LD	IY, Num_Table
-000291 0606                A    31    			LD	B, 6		; Consider 6 digits
-000293 0E06                A    32    			LD	C, 6		; Leading zero coun
-000295 FD1700              A    33    Print_Dec1:		LD	DE, (IY+0) 	; Take next pow
-000298 ED3304              A    34    			LEA	IY, IY+4
-00029B 3E2F                A    35    			LD	A, '0'-1
-00029D 3C                  A    36    $$:			INC	A
-00029E A7                  A    37    			AND 	A	
-00029F ED52                A    38    			SBC 	HL, DE		; Repeatedly su
-0002A1 30 FA               A    39    			JR	NC, $B
-0002A3 19                  A    40    			ADD	HL, DE		; Undo the last sub
-0002A4 FE30                A    41    			CP	'0'
-0002A6 20 03               A    42    			JR	NZ, $F		; Don't print leadi
-0002A8 0D                  A    43    			DEC	C	
-0002A9 20 04               A    44    			JR	NZ, Print_Dec2	; But do print 
-0002AB 5BD7                A    45    $$:			RST.LIL	10h
-0002AD 0E01                A    46    			LD	C, 1		; Make sure the nex
-0002AF 10 E4               A    47    Print_Dec2:		DJNZ	Print_Dec1
-0002B1 C1                  A    48    			POP 	BC
-0002B2 D1                  A    49    			POP	DE
-0002B3 FDE1                A    50    			POP	IY
-0002B5 C9                  A    51    			RET
+000298 FDE5                A    27    			PUSH	IY
+00029A D5                  A    28    			PUSH	DE
+00029B C5                  A    29    			PUSH 	BC
+00029C FD21 C6 02 00       A    30    			LD	IY, Num_Table
+0002A1 0606                A    31    			LD	B, 6		; Consider 6 digits
+0002A3 0E06                A    32    			LD	C, 6		; Leading zero coun
+0002A5 FD1700              A    33    Print_Dec1:		LD	DE, (IY+0) 	; Take next pow
+0002A8 ED3304              A    34    			LEA	IY, IY+4
+0002AB 3E2F                A    35    			LD	A, '0'-1
+0002AD 3C                  A    36    $$:			INC	A
+0002AE A7                  A    37    			AND 	A	
+0002AF ED52                A    38    			SBC 	HL, DE		; Repeatedly su
+0002B1 30 FA               A    39    			JR	NC, $B
+0002B3 19                  A    40    			ADD	HL, DE		; Undo the last sub
+0002B4 FE30                A    41    			CP	'0'
+0002B6 20 03               A    42    			JR	NZ, $F		; Don't print leadi
+0002B8 0D                  A    43    			DEC	C	
+0002B9 20 04               A    44    			JR	NZ, Print_Dec2	; But do print 
+0002BB 5BD7                A    45    $$:			RST.LIL	10h
+0002BD 0E01                A    46    			LD	C, 1		; Make sure the nex
+0002BF 10 E4               A    47    Print_Dec2:		DJNZ	Print_Dec1
+0002C1 C1                  A    48    			POP 	BC
+0002C2 D1                  A    49    			POP	DE
+0002C3 FDE1                A    50    			POP	IY
+0002C5 C9                  A    51    			RET
                            A    52    
-0002B6 A0860100            A    53    Num_Table		DL	100000
-0002BA 10270000            A    54    			DL	10000
-0002BE E8030000            A    55    			DL	1000
-0002C2 64000000            A    56    			DL	100
-0002C6 0A000000            A    57    			DL	10
-0002CA 01000000            A    58    			DL	1
+0002C6 A0860100            A    53    Num_Table		DL	100000
+0002CA 10270000            A    54    			DL	10000
+0002CE E8030000            A    55    			DL	1000
+0002D2 64000000            A    56    			DL	100
+0002D6 0A000000            A    57    			DL	10
+0002DA 01000000            A    58    			DL	1
                            A    59    
                            A    60    ; Print a counted string (preceded by a count b
                            A    61    ; Parameters:
                            A    62    ;  HL: Address of string (24-bit pointer)
                            A    63    ;
-0002CE C5                  A    64    Print_CString:          PUSH	BC  			
-0002CF 46                  A    65    			LD 	B, (HL)
-0002D0 AF                  A    66    			XOR	A
-0002D1 B8                  A    67    			CP	B
-0002D2 28 07               A    68    			JR	Z, Print_CString_End
-0002D4 23                  A    69    			INC 	HL
-0002D5 7E                  A    70    $$:			LD 	A, (HL)
-0002D6 5BD7                A    71    			RST.LIL 10h
-0002D8 23                  A    72    			INC 	HL
-0002D9 10 FA               A    73    			DJNZ 	$B	
-0002DB C1                  A    74    Print_CString_End:	POP	BC	
-0002DC C9                  A    75    			RET	
+0002DE C5                  A    64    Print_CString:          PUSH	BC  			
+0002DF 46                  A    65    			LD 	B, (HL)
+0002E0 AF                  A    66    			XOR	A
+0002E1 B8                  A    67    			CP	B
+0002E2 28 07               A    68    			JR	Z, Print_CString_End
+0002E4 23                  A    69    			INC 	HL
+0002E5 7E                  A    70    $$:			LD 	A, (HL)
+0002E6 5BD7                A    71    			RST.LIL 10h
+0002E8 23                  A    72    			INC 	HL
+0002E9 10 FA               A    73    			DJNZ 	$B	
+0002EB C1                  A    74    Print_CString_End:	POP	BC	
+0002EC C9                  A    75    			RET	
                            A    76    			
                            A    77    ; Print Carriage-return and linefeed.			
-0002DD 21 2A 03 00         A    78    Print_CRLF:		LD	HL, s_CRLF			
+0002ED 21 3A 03 00         A    78    Print_CRLF:		LD	HL, s_CRLF			
                            A    79    ; Print a zero-terminated string
                            A    80    ; Parameters:
                            A    81    ;  HL: Address of string (24-bit pointer)
                            A    82    ;
-0002E1 7E                  A    83    Print_String		LD	A,(HL)
-0002E2 B7                  A    84    			OR	A
-0002E3 C8                  A    85    			RET	Z
-0002E4 5BD7                A    86    			RST.LIL	10h
-0002E6 23                  A    87    			INC	HL
-0002E7 18 F8               A    88    			JR	Print_String
+0002F1 7E                  A    83    Print_String		LD	A,(HL)
+0002F2 B7                  A    84    			OR	A
+0002F3 C8                  A    85    			RET	Z
+0002F4 5BD7                A    86    			RST.LIL	10h
+0002F6 23                  A    87    			INC	HL
+0002F7 18 F8               A    88    			JR	Print_String
                            A    89    		
                            A    90    
                            A    91    ; Set display to inverse video	
-0002E9 21 2D 03 00         A    92    Inverse_Video:		LD 	HL, c_INVVID
-0002ED 18 DF               A    93    			JR 	Print_CString
+0002F9 21 3D 03 00         A    92    Inverse_Video:		LD 	HL, c_INVVID
+0002FD 18 DF               A    93    			JR 	Print_CString
                            A    94    
                            A    95    ; Set display to true video	
-0002EF 21 32 03 00         A    96    True_Video:		LD 	HL, c_TRUEVID
-0002F3 18 D9               A    97    			JR 	Print_CString
+0002FF 21 42 03 00         A    96    True_Video:		LD 	HL, c_TRUEVID
+000303 18 D9               A    97    			JR 	Print_CString
                            A    98    
                            A    99    ; Put VDU in 80 column mode, of not already the
-0002F5 DDE5                A   100    Setup_Screen:		PUSH 	IX
+000305 DDE5                A   100    Setup_Screen:		PUSH 	IX
                            A   101    			MOSCALL mos_sysvars
-0002FB DDCB04A6            A   102    			RES 	4, (IX+sysvar_vpd_pflags)	
-0002FF DDCB0466            A   103    $$:			BIT	4, (IX+sysvar_vpd_pflags)		
-000303 28 FA               A   104    			JR 	Z, $B		        ; Wait unti
-000305 DD7E14              A   105    			LD	A, (IX+sysvar_scrRows)
-000308 DD7E13              A   106    			LD	A, (IX+sysvar_scrCols)
-00030B FE50                A   107    			CP	80
-00030D 30 08               A   108    			JR	NC, Setup_End		; Apparentl
-00030F 3E16                A   109    			LD	A, 22
-000311 5BD7                A   110    			RST.LIL 10h
-000313 3E03                A   111    			LD	A, 3
-000315 5BD7                A   112    			RST.LIL 10h			; Enter Mode 3
-000317 DDCB04A6            A   113    Setup_End:		RES 	4, (IX+sysvar_vpd_pflag
-00031B DDCB0466            A   114    $$:			BIT	4, (IX+sysvar_vpd_pflags)		
-00031F 28 FA               A   115    			JR 	Z, $B		        ; Wait unti
-000321 DD7E14              A   116    			LD	A, (IX+sysvar_scrRows)
-000324 DD7E13              A   117    			LD	A, (IX+sysvar_scrCols)
-000327 DDE1                A   118    			POP	IX
-000329 C9                  A   119    			RET
+00030B DDCB04A6            A   102    			RES 	4, (IX+sysvar_vpd_pflags)	
+00030F DDCB0466            A   103    $$:			BIT	4, (IX+sysvar_vpd_pflags)		
+000313 28 FA               A   104    			JR 	Z, $B		        ; Wait unti
+000315 DD7E14              A   105    			LD	A, (IX+sysvar_scrRows)
+000318 DD7E13              A   106    			LD	A, (IX+sysvar_scrCols)
+00031B FE50                A   107    			CP	80
+00031D 30 08               A   108    			JR	NC, Setup_End		; Apparentl
+00031F 3E16                A   109    			LD	A, 22
+000321 5BD7                A   110    			RST.LIL 10h
+000323 3E03                A   111    			LD	A, 3
+000325 5BD7                A   112    			RST.LIL 10h			; Enter Mode 3
+000327 DDCB04A6            A   113    Setup_End:		RES 	4, (IX+sysvar_vpd_pflag
+00032B DDCB0466            A   114    $$:			BIT	4, (IX+sysvar_vpd_pflags)		
+00032F 28 FA               A   115    			JR 	Z, $B		        ; Wait unti
+000331 DD7E14              A   116    			LD	A, (IX+sysvar_scrRows)
+000334 DD7E13              A   117    			LD	A, (IX+sysvar_scrCols)
+000337 DDE1                A   118    			POP	IX
+000339 C9                  A   119    			RET
                            A   120    			
-00032A 0D0A00              A   121    s_CRLF:			DB	13,10,0
+00033A 0D0A00              A   121    s_CRLF:			DB	13,10,0
                            A   122    
-00032D 04                  A   123    c_INVVID:		DB	4
-00032E 1100                A   124    			DB 	17, 0 		; Forgeground black
-000330 118F                A   125    			DB	17, 143		; Background white
-000332 04                  A   126    c_TRUEVID:		DB	4
-000333 110F                A   127    			DB	17, 15		; Foreground white
-000335 1180                A   128    			DB	17, 128		; Background black
-000337 040F1700 86         A   129    c_GETMODE               DB	4, 15,23,0,vdp_mode
+00033D 04                  A   123    c_INVVID:		DB	4
+00033E 1100                A   124    			DB 	17, 0 		; Forgeground black
+000340 118F                A   125    			DB	17, 143		; Background white
+000342 04                  A   126    c_TRUEVID:		DB	4
+000343 110F                A   127    			DB	17, 15		; Foreground white
+000345 1180                A   128    			DB	17, 128		; Background black
+000347 040F1700 86         A   129    c_GETMODE               DB	4, 15,23,0,vdp_mode
                            A   130    ; RAM
                            A   131    ; 
                            A   132    			DEFINE	LORAM, SPACE = ROM
