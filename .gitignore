@@ -3,3 +3,5 @@
 *.obj
 *.lod
 *.map
+*.linkcmd
+*.mak
