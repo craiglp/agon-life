@@ -1,4 +1,4 @@
-Zilog eZ80 Macro Assembler Version 4.3 (19073001) RELISTED24-Apr-23     21:25:25     page:   1
+Zilog eZ80 Macro Assembler Version 4.3 (19073001) RELISTED24-Apr-23     21:56:21     page:   1
 
 
 PC     Object              I  Line    Source 
@@ -298,11 +298,11 @@ PC     Object              I  Line    Source
                            A    38    			
        00000454            A    39    			TOT_CELLS	EQU		(ROWS+2)*(COLS+
                            A    40    
-       00000156            A    41    			CURRBASE    EQU     _MATRIX_START  
-       00000180            A    42    			CURRSTART   EQU     CURRBASE+COLS+2
+       00000159            A    41    			CURRBASE    EQU     _MATRIX_START  
+       00000183            A    42    			CURRSTART   EQU     CURRBASE+COLS+2
                            A    43    
-       000005AB            A    44    			NEXTBASE    EQU     CURRBASE+TOT_CE
-       000005D5            A    45    			NEXTSTART   EQU     NEXTBASE+COLS+2
+       000005AE            A    44    			NEXTBASE    EQU     CURRBASE+TOT_CE
+       000005D8            A    45    			NEXTSTART   EQU     NEXTBASE+COLS+2
                            A    46    			
        0000002A            A    47                UPPER_LEFT		EQU		COLS+2		
        00000029            A    48                UPPER_MID		EQU		COLS+1		
@@ -369,18 +369,18 @@ PC     Object              I  Line    Source
 000152 3E00                A   109    			LD		A, 0
 000154 5BD7                A   110    			RST.LIL	10h			
                            A   111    			
-000156 21 8E 02            A   112    			LD		HL, s_CELL_CHAR
+000156 21 91 02            A   112    			LD		HL, s_CELL_CHAR
 000159 CD 4D 02            A   113    			CALL	Print_String
                            A   114    
 00015C                     A   115    START:
-00015C 21 98 02            A   116                LD      HL,CURRBASE     ;Clear Curr
-00015F 11 99 02            A   117                LD      DE,CURRBASE+1 
+00015C 21 9B 02            A   116                LD      HL,CURRBASE     ;Clear Curr
+00015F 11 9C 02            A   117                LD      DE,CURRBASE+1 
 000162 AF                  A   118                XOR     A               ;Set to Zer
 000163 77                  A   119                LD      (HL),A 
 000164 015404              A   120                LD      BC,TOT_CELLS    ;Cells to b
 000167 EDB0                A   121                LDIR                    ;Do the Cop
-000169 21 AB 05            A   122                LD      HL,NEXTBASE     ;Clear Next
-00016C 11 AC 05            A   123                LD      DE,NEXTBASE+1 
+000169 21 AE 05            A   122                LD      HL,NEXTBASE     ;Clear Next
+00016C 11 AF 05            A   123                LD      DE,NEXTBASE+1 
 00016F AF                  A   124                XOR     A               ;Set to Zer
 000170 77                  A   125                LD      (HL),A 
 000171 015404              A   126                LD      BC,TOT_CELLS    ;1108 cells
@@ -427,8 +427,8 @@ PC     Object              I  Line    Source
                            A   167    			;    * Any dead cell with three liv
                            A   168    			;    * All other live cells die in 
 0001A4                     A   169    CONWAY:
-0001A4 DD21 80 01          A   170                LD      IX,CURRSTART
-0001A8 21 D5 05            A   171                LD      HL,NEXTSTART
+0001A4 DD21 83 01          A   170                LD      IX,CURRSTART
+0001A8 21 D8 05            A   171                LD      HL,NEXTSTART
 0001AB 0619                A   172                LD      B,ROWS
 0001AD                     A   173    	NEWROW:              
 0001AD C5                  A   174                PUSH    BC ;Save Registers
@@ -472,8 +472,8 @@ PC     Object              I  Line    Source
 0001E5 10 C6               A   212                DJNZ    NEWROW               ;Repea
                            A   213    
                            A   214                ;Copy next matrix to current
-0001E7 21 D5 05            A   215                LD      HL,NEXTSTART 
-0001EA 11 80 01            A   216                LD      DE,CURRSTART 
+0001E7 21 D8 05            A   215                LD      HL,NEXTSTART 
+0001EA 11 83 01            A   216                LD      DE,CURRSTART 
 0001ED 010004              A   217                LD      BC,0400h             ;1024 
 0001F0 EDB0                A   218                LDIR                         ;Do th
                            A   219    
@@ -484,7 +484,7 @@ PC     Object              I  Line    Source
                            A   224                ;an psuedo random routine.  If that
                            A   225                ;cell to Alive.
 0001F3                     A   226    LOAD_RANDOM:
-0001F3 21 80 01            A   227    			LD      HL,CURRSTART 
+0001F3 21 83 01            A   227    			LD      HL,CURRSTART 
 0001F6 0619                A   228                LD      B,ROWS 
 0001F8                     A   229    	COL:									;Co
 0001F8 C5                  A   230                PUSH    BC 
@@ -521,104 +521,107 @@ PC     Object              I  Line    Source
 00021B                     A   261    PRINT_CELLS:
 00021B 3E0C                A   262    			LD		A,12				;Clear 
 00021D 5BD7                A   263    			RST.LIL	10h
-                           A   264    			
-00021F DD21 80 01          A   265    			LD      IX,CURRSTART 
-000223 0619                A   266    			LD		B,ROWS
-000225                     A   267    	col_loop:
-000225 C5                  A   268    			PUSH	BC
-000226 0628                A   269    			LD		B,COLS
-000228                     A   270    	row_loop:
-000228 DD7E00              A   271    			LD		A,(IX)
-00022B CD 40 02            A   272    			CALL	Print_Cell
-                           A   273    			
-00022E DD23                A   274    			INC		IX
-000230 10 F6               A   275    			DJNZ	row_loop
-                           A   276    
-                           A   277    			;Print CR/LF after each row
-000232 57                  A   278    			LD		D, A
-000233 3E0D                A   279    			LD		A, 0Dh
-000235 49D7                A   280    			RST.LIS	10h
-000237 3E0A                A   281    			LD		A, 0Ah
-000239 49D7                A   282    			RST.LIS	10h
-00023B 7A                  A   283    			LD		A, D
-                           A   284    			
-00023C C1                  A   285    			POP		BC
-00023D 10 E6               A   286    			DJNZ	col_loop
-00023F C9                  A   287    			RET							;Exit
-                           A   288    
-000240                     A   289    Print_Cell:
-000240 4F                  A   290    			LD C,A
-000241 FE01                A   291    			CP 01h
-000243 3E20                A   292    			LD A, 20h
-000245 20 02               A   293    			JR NZ,PZ
-000247 3E82                A   294    			LD A, 130
-000249 49D7                A   295    	PZ:		RST.LIS 10h
-00024B 79                  A   296    			LD A,C
-00024C C9                  A   297    			RET
-                           A   298    			
-00024D                     A   299    Print_String:
-00024D 010000              A   300    			LD		BC, 0
-000250 3E00                A   301    			LD		A, 0
-000252 49DF                A   302    			RST.LIS	18h
-000254 C9                  A   303    			RET
-                           A   304    
-                           A   305    ; Print an 8-bit HEX number
-                           A   306    ; A: Number to print
-000255                     A   307    Print_Hex8:
-000255 4F                  A   308    			LD		C,A
-000256 1F                  A   309    			RRA 
-000257 1F                  A   310    			RRA 
-000258 1F                  A   311    			RRA 
-000259 1F                  A   312    			RRA 
-00025A CD 5E 02            A   313    			CALL	$F 
-00025D 79                  A   314    			LD		A,C 
-00025E E60F                A   315    $$:			AND		0Fh
-000260 C690                A   316    			ADD		A,90h
-000262 27                  A   317    			DAA
-000263 CE40                A   318    			ADC		A,40h
-000265 27                  A   319    			DAA
-000266 49D7                A   320    			RST.LIS	10h
-000268 C9                  A   321    			RET
-                           A   322    			
-                           A   323    ; returns pseudo random 8 bit number in A. Only
-                           A   324    ; (r_seed) is the byte from which the number is
-                           A   325    ; initialised to a non zero value or this funct
-                           A   326    ; zero. Also r_seed must be in RAM, you can see
-000269                     A   327    RAND_8:
-000269 3A 7B 02            A   328    			LD	A,(r_seed)	; get seed
-00026C E6B8                A   329    			AND	#B8h		; mask non feedback
-00026E 37                  A   330    			SCF				; set carry
-00026F E2 73 02            A   331    			JP	PO,no_clr	; skip clear if odd
-000272 3F                  A   332    			CCF				; complement carry 
-000273                     A   333    	no_clr:
-000273 3A 7B 02            A   334    			LD	A,(r_seed)	; get seed back
-000276 17                  A   335    			RLA				; rotate carry into
-000277 32 7B 02            A   336    			LD	(r_seed),A	; save back for nex
-00027A C9                  A   337    			RET				; done
-00027B                     A   338    	r_seed:
-00027B FE                  A   339    			DB	254			; prng seed byte (m
-                           A   340    	
-                           A   341    
-                           A   342    
-                           A   343    ; Text strings
-                           A   344    ;
-00027C 0A0D4669 6E697368   A   345    s_LIFE_END:	DB 	"\n\rFinished\n\r", 0
+                           A   264    			;LD		HL, s_HOME			;Home t
+                           A   265    			;CALL	Print_String
+                           A   266    			
+00021F DD21 83 01          A   267    			LD      IX,CURRSTART 
+000223 0619                A   268    			LD		B,ROWS
+000225                     A   269    	col_loop:
+000225 C5                  A   270    			PUSH	BC
+000226 0628                A   271    			LD		B,COLS
+000228                     A   272    	row_loop:
+000228 DD7E00              A   273    			LD		A,(IX)
+00022B CD 40 02            A   274    			CALL	Print_Cell
+                           A   275    			
+00022E DD23                A   276    			INC		IX
+000230 10 F6               A   277    			DJNZ	row_loop
+                           A   278    
+                           A   279    			;Print CR/LF after each row
+000232 57                  A   280    			LD		D, A
+000233 3E0D                A   281    			LD		A, 0Dh
+000235 49D7                A   282    			RST.LIS	10h
+000237 3E0A                A   283    			LD		A, 0Ah
+000239 49D7                A   284    			RST.LIS	10h
+00023B 7A                  A   285    			LD		A, D
+                           A   286    			
+00023C C1                  A   287    			POP		BC
+00023D 10 E6               A   288    			DJNZ	col_loop
+00023F C9                  A   289    			RET							;Exit
+                           A   290    
+000240                     A   291    Print_Cell:
+000240 4F                  A   292    			LD C,A
+000241 FE01                A   293    			CP 01h
+000243 3E20                A   294    			LD A, 20h
+000245 20 02               A   295    			JR NZ,PZ
+000247 3E82                A   296    			LD A, 130
+000249 49D7                A   297    	PZ:		RST.LIS 10h
+00024B 79                  A   298    			LD A,C
+00024C C9                  A   299    			RET
+                           A   300    			
+00024D                     A   301    Print_String:
+00024D 010000              A   302    			LD		BC, 0
+000250 3E00                A   303    			LD		A, 0
+000252 49DF                A   304    			RST.LIS	18h
+000254 C9                  A   305    			RET
+                           A   306    
+                           A   307    ; Print an 8-bit HEX number
+                           A   308    ; A: Number to print
+000255                     A   309    Print_Hex8:
+000255 4F                  A   310    			LD		C,A
+000256 1F                  A   311    			RRA 
+000257 1F                  A   312    			RRA 
+000258 1F                  A   313    			RRA 
+000259 1F                  A   314    			RRA 
+00025A CD 5E 02            A   315    			CALL	$F 
+00025D 79                  A   316    			LD		A,C 
+00025E E60F                A   317    $$:			AND		0Fh
+000260 C690                A   318    			ADD		A,90h
+000262 27                  A   319    			DAA
+000263 CE40                A   320    			ADC		A,40h
+000265 27                  A   321    			DAA
+000266 49D7                A   322    			RST.LIS	10h
+000268 C9                  A   323    			RET
+                           A   324    			
+                           A   325    ; returns pseudo random 8 bit number in A. Only
+                           A   326    ; (r_seed) is the byte from which the number is
+                           A   327    ; initialised to a non zero value or this funct
+                           A   328    ; zero. Also r_seed must be in RAM, you can see
+000269                     A   329    RAND_8:
+000269 3A 7B 02            A   330    			LD	A,(r_seed)	; get seed
+00026C E6B8                A   331    			AND	#B8h		; mask non feedback
+00026E 37                  A   332    			SCF				; set carry
+00026F E2 73 02            A   333    			JP	PO,no_clr	; skip clear if odd
+000272 3F                  A   334    			CCF				; complement carry 
+000273                     A   335    	no_clr:
+000273 3A 7B 02            A   336    			LD	A,(r_seed)	; get seed back
+000276 17                  A   337    			RLA				; rotate carry into
+000277 32 7B 02            A   338    			LD	(r_seed),A	; save back for nex
+00027A C9                  A   339    			RET				; done
+00027B                     A   340    	r_seed:
+00027B FE                  A   341    			DB	254			; prng seed byte (m
+                           A   342    	
+                           A   343    
+                           A   344    
+                           A   345    ; Text strings
+                           A   346    ;
+00027C 0A0D4669 6E697368   A   347    s_LIFE_END:	DB 	"\n\rFinished\n\r", 0
 000284 65640A0D 00 
-000289 0A0D00              A   346    s_cr_lf:	DB	"\n\r", 0
-00028C 0D00                A   347    s_cr:		DB	"\r", 0
-                           A   348    
-00028E 17823C7E FFFFFFFF   A   349    s_CELL_CHAR DB 23,130,3Ch,7Eh,FFh,FFh,FFh,FFh,7
-000296 7E3C 
-                           A   350    
-000298                     A   351    _MATRIX_START:
-                           A   352    	
-                           A   353    ; RAM
-                           A   354    ; 
-                           A   355    			DEFINE	LORAM, SPACE = ROM
-                           A   356    			SEGMENT LORAM
-                           A   357    			
+000289 0A0D00              A   348    s_cr_lf:	DB	"\n\r", 0
+00028C 0D00                A   349    s_cr:		DB	"\r", 0
+00028E 1E0000              A   350    s_HOME		DB	30,0,0
+                           A   351    
+000291 17823C7E FFFFFFFF   A   352    s_CELL_CHAR DB	23,130,3Ch,7Eh,FFh,FFh,FFh,FFh,
+000299 7E3C 
+                           A   353    
+00029B                     A   354    _MATRIX_START:
+                           A   355    	
+                           A   356    ; RAM
+                           A   357    ; 
+                           A   358    			DEFINE	LORAM, SPACE = ROM
+                           A   359    			SEGMENT LORAM
+                           A   360    			
 
 
 Errors: 0
 Warnings: 0
-Lines Assembled: 617
+Lines Assembled: 620

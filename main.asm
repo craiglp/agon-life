@@ -261,6 +261,8 @@ LOAD_RANDOM:
 PRINT_CELLS:
 			LD		A,12				;Clear Text Screen
 			RST.LIL	10h
+			;LD		HL, s_HOME			;Home text cursor
+			;CALL	Print_String
 			
 			LD      IX,CURRSTART 
 			LD		B,ROWS
@@ -345,8 +347,9 @@ RAND_8:
 s_LIFE_END:	DB 	"\n\rFinished\n\r", 0
 s_cr_lf:	DB	"\n\r", 0
 s_cr:		DB	"\r", 0
+s_HOME		DB	30,0,0
 
-s_CELL_CHAR DB 23,130,3Ch,7Eh,FFh,FFh,FFh,FFh,7Eh,3Ch
+s_CELL_CHAR DB	23,130,3Ch,7Eh,FFh,FFh,FFh,FFh,7Eh,3Ch
 
 _MATRIX_START:
 	
