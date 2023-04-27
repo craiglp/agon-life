@@ -33,8 +33,9 @@
 			XDEF	_main
 			
 			SCRMODE		EQU		3h				  		;Screen Mode 3
-			ROWS        EQU     25                		;25 Rows on screen
-			COLS        EQU     40                		;40 Columns on screen
+			
+			ROWS        EQU     59                		;Rows on screen
+			COLS        EQU     79                		;Columns on screen
 			
 			TOT_CELLS	EQU		(ROWS+2)*(COLS+1)+1		;Total number of cells
 
@@ -214,13 +215,13 @@ CONWAY:
             ;Copy next matrix to current
             LD      HL,NEXTSTART 
             LD      DE,CURRSTART 
-            LD      BC,0400h             ;1024 cells (include left zero buffer)
+            LD      BC,TOT_CELLS         ;All cells (include left zero buffer)
             LDIR                         ;Do the Copy
 
             RET                          ;Exit
 			
 
-			;Load Random cells in memory.  This interates through all 1000 cells and calls
+			;Load Random cells in memory.  This interates through all cells and calls
             ;an psuedo random routine.  If that routine sets the carry flag then set the 
             ;cell to Alive.
 LOAD_RANDOM:
@@ -242,21 +243,6 @@ LOAD_RANDOM:
             POP     BC 
             DJNZ    COL 
             RET							;Exit
-
-            ;Random boolean value.  Carry flag set if true
-	RAND:                
-            PUSH    BC 
-            LD      A,R                  ;Random Number Generation
-            LD      B,A 
-            RRCA                         ;Multiply by 32
-            RRCA     
-            RRCA     
-            XOR     1Fh 
-            ADD     A,B 
-            SBC     A,FFh 
-            POP     BC 
-            RRCA                         ;Check bit 0 if set then make true
-            RET      
 
 PRINT_CELLS:
 			LD		A,12				;Clear Text Screen
@@ -292,37 +278,13 @@ Print_Cell:
 			LD C,A
 			CP 01h
 			LD A, 20h
-			JR NZ,PZ
+			JR NZ,$F
 			LD A, 130
-	PZ:		RST.LIS 10h
+	$$:		RST.LIS 10h
 			LD A,C
 			RET
 			
-Print_String:
-			LD		BC, 0
-			LD		A, 0
-			RST.LIS	18h
-			RET
-
-; Print an 8-bit HEX number
-; A: Number to print
-Print_Hex8:
-			LD		C,A
-			RRA 
-			RRA 
-			RRA 
-			RRA 
-			CALL	$F 
-			LD		A,C 
-$$:			AND		0Fh
-			ADD		A,90h
-			DAA
-			ADC		A,40h
-			DAA
-			RST.LIS	10h
-			RET
-			
-; returns pseudo random 8 bit number in A. Only affects A.
+; Returns pseudo random 8 bit number in A. Only affects A.
 ; (r_seed) is the byte from which the number is generated and MUST be
 ; initialised to a non zero value or this function will always return
 ; zero. Also r_seed must be in RAM, you can see why......			
@@ -340,6 +302,30 @@ RAND_8:
 	r_seed:
 			DB	254			; prng seed byte (must not be zero)
 	
+
+; Print an 8-bit HEX number
+; A: Number to print
+Print_Hex8:
+			LD		C,A
+			RRA 
+			RRA 
+			RRA 
+			RRA 
+			CALL	$F 
+			LD		A,C 
+	$$:		AND		0Fh
+			ADD		A,90h
+			DAA
+			ADC		A,40h
+			DAA
+			RST.LIS	10h
+			RET
+			
+Print_String:
+			LD		BC, 0
+			LD		A, 0
+			RST.LIS	18h
+			RET
 
 
 ; Text strings
