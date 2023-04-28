@@ -3,7 +3,9 @@
 Conway's Game of Life for the Agon Light
 
 https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life
--------------------------------------
+
+---
+
 
  Based on the Amstrad CPC version written by Brian Chiha
  brian.chiha@gmail.com  -- Mar 2021
@@ -70,7 +72,7 @@ Each generation is evaluated when you hit a key. Hitting Escape will exit.
 <<< Much more to come >>>
 
 TODO: 
-* Custom icon/image for 'live' cells
+* ~~Custom icon/image for 'live' cells~~
 * Make matrix 'infinite', full wrap-around in all directions
 * Plot matrix properly, rather than clear screen, print row by row
 * Generation counter
