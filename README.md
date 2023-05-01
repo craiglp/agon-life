@@ -8,6 +8,7 @@ https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life
 
 
  Based on the Amstrad CPC version written by Brian Chiha
+ https://github.com/bchiha/Ready-Z80/blob/main/03-Game_of_life/game_of_life.z80
  brian.chiha@gmail.com  -- Mar 2021
 
  Game of Life is a cellular automation simulation.  Each cell evolves based on the number
