@@ -133,12 +133,13 @@ START:
 
 NEWCELLS:
 			CALL	LOAD_RANDOM		;Initialize cell data with random values
+			CALL	PRINT_CELLS		
 
 LIFE:
+			CALL	CONWAY			;Do Conway Rules on current cells
+
 			CALL	PRINT_CELLS		
 			CALL	PRINT_STATUSLINE
-			
-			CALL	CONWAY			;Do Conway Rules on current cells
 			
 			;Loop until key pressed			
 			MOSCALL	mos_getkey
@@ -225,13 +226,13 @@ CONWAY:
 			RET								;Exit
 			
 
-			;Load Random cells in memory.  This interates through all cells and calls
-			;an psuedo random routine.  If that routine sets the carry flag then set the 
-			;cell to Alive.
+;Load random cells in memory. This interates through all cells and calls
+;an psuedo random routine. If that routine sets the carry flag then set the 
+;cell to Alive.
 LOAD_RANDOM:
 			LD		HL,CURRSTART 
 			LD		B,ROWS 
-	COL:									;Columns
+	COL:								;Columns
 			PUSH	BC 
 			LD		B,COLS 
 	ROW:								;Rows
@@ -248,8 +249,9 @@ LOAD_RANDOM:
 			DJNZ	COL 
 			RET							;Exit
 
+;Loop through the current array and print cells
 PRINT_CELLS:
-			LD		A,31			;Home text cursor
+			LD		A,31				;Home text cursor
 			RST.LIL	10h
 			LD		A,0
 			RST.LIL	10h
@@ -264,7 +266,7 @@ PRINT_CELLS:
 			
 	row_loop:
 			LD		A,(IX)
-			CALL	Print_Cell
+			CALL	Print_Cell			;Print the value in (IX)
 		
 			INC		IX
 			DJNZ	row_loop
@@ -281,6 +283,7 @@ PRINT_CELLS:
 			DJNZ	col_loop
 			RET							;Exit
 
+;Print a cell, if alive, blank if dead
 Print_Cell:
 			LD C,A
 			CP 01h
@@ -290,7 +293,8 @@ Print_Cell:
 	$$:		RST.LIS 10h
 			LD A,C
 			RET							;Exit
-			
+
+;Print generation count at bottom of screen
 PRINT_STATUSLINE:
 			LD		A, 31				;Move cursor to status line
 			RST.LIL	10h
@@ -399,7 +403,7 @@ s_cr:		DB	"\r", 0
 s_HOME		DB	30,0,0
 s_STATUS	DB	"Generation: ", 0
 
-s_CELL_CHAR DB	23,130,3Ch,7Eh,C3h,DBh,DBh,C3h,7Eh,3Ch
+s_CELL_CHAR DB	23,130,18h,3Ch,42h,DBh,DBh,42h,3Ch,18h
 
 GENERATION	DB	0
 
