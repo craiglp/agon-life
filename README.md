@@ -7,12 +7,11 @@ https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life
 ---
 
 
-Based on the Amstrad CPC version written by Brian Chiha -- Mar 2021
+Based on the Amstrad CPC version written by Brian Chiha -- Mar 2021<br>
 https://github.com/bchiha/Ready-Z80/blob/main/03-Game_of_life/game_of_life.z80
 
-
-Also, got inspiration from:
-Conway's game of life by Joe Helmick (c) 2019
+Also, got inspiration from:<br>
+Conway's game of life by Joe Helmick (c)2019<br>
 https://gitlab.com/joe_helmick/life-rom
 
  Game of Life is a cellular automation simulation.  Each cell evolves based on the number
@@ -37,7 +36,9 @@ If Cell is alive it will be set to 1, if it is dead, it will be zero.
  Memory Map With Upper/Lower/Left/Right buffer.  Total of 1108 Bytes for a 40x25 matrix
  X = potential cell position, 0 = always zero
 
-   000102030405060708090A0B0C0D0E0F101112131415161718191A1B1C1D1E1F202122232425262728
+    0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 2 2 2 2 2 2 2 2 2
+    0 1 2 3 4 5 6 7 8 9 A B C D E F 0 1 2 3 4 5 6 7 8 9 A B C D E F 0 1 2 3 4 5 6 7 8
+    
 00  0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
 01  0 X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X
 02  0 X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X
@@ -68,8 +69,8 @@ If Cell is alive it will be set to 1, if it is dead, it will be zero.
 1B  0  <= needed for last bottom right check
 ```
 
-Requires: 
-MOS 1.03
+Requires: <br>
+MOS 1.03 <br>
 VDP 1.03
 
 Each generation is evaluated when you hit a key. Hitting Escape will exit.
