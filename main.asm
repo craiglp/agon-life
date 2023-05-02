@@ -34,7 +34,7 @@
 			
 			SCRMODE		EQU		3h				  		;Screen Mode 3
 			
-			ROWS        EQU     59                		;Rows on screen
+			ROWS        EQU     57                		;Rows on screen -2 rows for status line
 			COLS        EQU     79                		;Columns on screen
 			
 			TOT_CELLS	EQU		(ROWS+2)*(COLS+1)+1		;Total number of cells
@@ -110,8 +110,12 @@ _main:
 			LD		A, 0
 			RST.LIL	10h			
 			
+			;Set Alive Cell character
 			LD		HL, s_CELL_CHAR
 			CALL	Print_String
+
+			LD		A,12		;Clear Text Screen
+			RST.LIL	10h
 
 START:
             LD      HL,CURRBASE     ;Clear Current Cell data location to be all zeros
@@ -133,6 +137,9 @@ NEWCELLS:
 LIFE:
 			CALL	PRINT_CELLS
 			;CALL    DISPLAY_CELLS	;Fill screen with current cells
+			
+			
+			CALL	PRINT_STATUSLINE
 			
             CALL    CONWAY			;Do Conway Rules on current cells
 			
@@ -161,12 +168,12 @@ LIFE:
 			LD		HL, 0			;Return, Error code = 0
 			RET
 
-            ;Update the matrix with Conway Rules.  Nested For loop with Rows and Columns.
-			;The basic cell rules are:
-			;
-			;    * Any live cell with two or three live neighbours survives.
-			;    * Any dead cell with three live neighbours becomes a live cell.
-			;    * All other live cells die in the next generation. Similarly, all other dead cells stay dead.
+;Update the matrix with Conway Rules.  Nested For loop with Rows and Columns.
+;The basic cell rules are:
+;
+;    * Any live cell with two or three live neighbours survives.
+;    * Any dead cell with three live neighbours becomes a live cell.
+;    * All other live cells die in the next generation. Similarly, all other dead cells stay dead.
 CONWAY:
             LD      IX,CURRSTART
             LD      HL,NEXTSTART
@@ -245,10 +252,12 @@ LOAD_RANDOM:
             RET							;Exit
 
 PRINT_CELLS:
-			LD		A,12				;Clear Text Screen
+			LD		A,31			;Home text cursor
 			RST.LIL	10h
-			;LD		HL, s_HOME			;Home text cursor
-			;CALL	Print_String
+			LD		A,0
+			RST.LIL	10h
+			LD		A,0
+			RST.LIL	10h
 			
 			LD      IX,CURRSTART 
 			LD		B,ROWS
@@ -282,6 +291,25 @@ Print_Cell:
 			LD A, 130
 	$$:		RST.LIS 10h
 			LD A,C
+			RET
+			
+PRINT_STATUSLINE:
+			LD		A, 31				;Move cursor to status line
+			RST.LIL	10h
+			LD		A, 0
+			RST.LIL	10h
+			LD		A, ROWS+2
+			RST.LIL	10h
+
+			LD		HL, s_STATUS		;Print generation count text
+			CALL	Print_String
+			LD		HL, (GENERATION)	;Print generation count
+			CALL	Print_Decimal
+
+			LD		A,(GENERATION)		;Increment generation count
+			INC		A
+			LD		(GENERATION),A
+			
 			RET
 			
 ; Returns pseudo random 8 bit number in A. Only affects A.
@@ -327,6 +355,43 @@ Print_String:
 			RST.LIS	18h
 			RET
 
+Print_Decimal:	
+; Print a decimal number (less than 1000000)';
+;
+; Input: HL 24-bit number to print.
+			PUSH	IY
+			PUSH	DE
+			PUSH 	BC
+			LD	IY, Num_Table
+			LD	B, 6		; Consider 6 digits
+			LD	C, 6		; Leading zero counter, reaches 1 if sixth digit sill 0.		; 
+Print_Dec1:	LD	DE, (IY+0) 	; Take next power of 10.
+			LEA	IY, IY+4
+			LD	A, '0'-1
+$$:			INC	A
+			AND 	A	
+			SBC 	HL, DE		; Repeatedly subtract power of 10 until carry
+			JR	NC, $B
+			ADD	HL, DE		; Undo the last subtract that caused carry					
+			CP	'0'
+			JR	NZ, $F		; Don't print leading zero			
+			DEC	C	
+			JR	NZ, Print_Dec2	; But do print 0 if it's the units digit.
+$$:			RST.LIL	10h
+			LD	C, 1		; Make sure the next digit will be printed.
+Print_Dec2:		DJNZ	Print_Dec1
+			POP 	BC
+			POP	DE
+			POP	IY
+			RET
+
+Num_Table	DL	100000
+			DL	10000
+			DL	1000
+			DL	100
+			DL	10
+			DL	1
+
 
 ; Text strings
 ;
@@ -334,8 +399,11 @@ s_LIFE_END:	DB 	"\n\rFinished\n\r", 0
 s_cr_lf:	DB	"\n\r", 0
 s_cr:		DB	"\r", 0
 s_HOME		DB	30,0,0
+s_STATUS	DB	"Generation: ", 0
 
 s_CELL_CHAR DB	23,130,3Ch,7Eh,FFh,FFh,FFh,FFh,7Eh,3Ch
+
+GENERATION	DB	0
 
 _MATRIX_START:
 	

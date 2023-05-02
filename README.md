@@ -75,8 +75,8 @@ Each generation is evaluated when you hit a key. Hitting Escape will exit.
 TODO: 
 * ~~Custom icon/image for 'live' cells~~
 * Make matrix 'infinite', full wrap-around in all directions
-* Plot matrix properly, rather than clear screen, print row by row
-* Generation counter
+* Plot matrix properly, rather than ~~clear screen~~, print row by row
+* ~~Generation counter~~
 * Full run, with keyboard scan. Run until stopped, rather than one generation per keystroke
 * User config of matrix start state 
 
