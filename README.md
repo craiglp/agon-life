@@ -7,9 +7,13 @@ https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life
 ---
 
 
- Based on the Amstrad CPC version written by Brian Chiha
+Based on the Amstrad CPC version written by Brian Chiha
  https://github.com/bchiha/Ready-Z80/blob/main/03-Game_of_life/game_of_life.z80
  brian.chiha@gmail.com  -- Mar 2021
+
+Also, got inspiration from:
+ Conway's game of life by Joe Helmick (c) 2019
+ https://gitlab.com/joe_helmick/life-rom
 
  Game of Life is a cellular automation simulation.  Each cell evolves based on the number
  of cells that surround it.  The basic cell rules are:
@@ -19,7 +23,7 @@ https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life
     * All other live cells die in the next generation. Similarly, all other dead cells stay dead.
 
 
-Calcuation for next cells are done from memory starting at _MATRIC_START.  Current Base is 
+Calcuation for next cells are done from memory starting at _MATRIX_START.  Current Base is 
 what is displayed
 on the screen, Next Base is used to place the next life cycle.  Once all cells are check
 Next Base will be copied to Current Base
