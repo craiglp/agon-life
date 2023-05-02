@@ -7,13 +7,13 @@ https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life
 ---
 
 
-Based on the Amstrad CPC version written by Brian Chiha
- https://github.com/bchiha/Ready-Z80/blob/main/03-Game_of_life/game_of_life.z80
- brian.chiha@gmail.com  -- Mar 2021
+Based on the Amstrad CPC version written by Brian Chiha -- Mar 2021
+https://github.com/bchiha/Ready-Z80/blob/main/03-Game_of_life/game_of_life.z80
+
 
 Also, got inspiration from:
- Conway's game of life by Joe Helmick (c) 2019
- https://gitlab.com/joe_helmick/life-rom
+Conway's game of life by Joe Helmick (c) 2019
+https://gitlab.com/joe_helmick/life-rom
 
  Game of Life is a cellular automation simulation.  Each cell evolves based on the number
  of cells that surround it.  The basic cell rules are:
