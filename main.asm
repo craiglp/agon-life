@@ -1,7 +1,7 @@
 ;
 ; Title:	Life - Main
 ; Author:	Craig Patterson
-; Created:	04/02/2023
+; Created:	06/30/2023
 
 ; Conway's Game of Life for Amstrad CPC
 ; -------------------------------------
@@ -11,7 +11,7 @@
 ; brian.chiha@gmail.com  -- Mar 2021
 ;
 ; Agon Light version written by Craig Patterson
-; craiglp@gmail.com -- Apr 2023
+; craiglp@gmail.com -- Jun 2023
 ;
 ; Game of Life is a cellular automation simulation.  Each cell evolves based on the number
 ; of cells that surround it.  The basic cell rules are:
@@ -20,10 +20,32 @@
 ;    * Any dead cell with three live neighbours becomes a live cell.
 ;    * All other live cells die in the next generation. Similarly, all other dead cells stay dead.
 ;
+;To work out top/bottom cells, Place a zero row one above and below the ROW*COL cell table. To
+;handle left/right cells, place one zero column on the left. And for the bottom right cell
+;add one extra byte.
+;
+;If cell is alive it will be set to 1, if it is dead, it will be zero.
+
+; Memory map with upper/lower/left/right buffer.  Total of 1108 bytes for 40x25 matrix
+; X = potential cell position, 0 = always zero
+;
+;    0 0 0 0 0 0 0 0 0 0
+;    0 1 2 3 4 5 6 7 8 9
+;
+;00  0 0 0 0 0 0 0 0 0 0
+;01  0 X X X X X X X X X
+;02  0 X X X X X X X X X
+;03  0 X X X X X X X X X
+;04  0 X X X X X X X X X
+;05  0 X X X X X X X X X
+;06  0 X X X X X X X X X
+;07  0 X X X X X X X X X
+;08  0 X X X X X X X X X
+;09  0 X X X X X X X X X
+;0A  0  <= needed for last bottom right check
 
 
-
-			.ASSUME	ADL = 0				
+			.ASSUME	ADL = 1	
 
 			INCLUDE	"equs.inc"
 			INCLUDE "mos_api.inc"
@@ -32,18 +54,18 @@
 
 			XDEF	_main
 
-			SCRMODE		EQU		3h							;Screen Mode 3
+			SCRMODE			EQU		3h						;Screen Mode 3
 
 			ROWS			EQU		57						;Rows on screen -2 rows for status line
 			COLS			EQU		79						;Columns on screen
 
 			TOT_CELLS		EQU		(ROWS+2)*(COLS+1)+1		;Total number of cells
 
-			CURRBASE		EQU		_MATRIX_START			;Base address of Cell primary cell table
-			CURRSTART		EQU		CURRBASE+COLS+2			;Primary start position Base+42
+			CURRBASE		EQU		_MATRIX_START			;Base address of cell primary cell table
+			CURRSTART		EQU		CURRBASE+COLS+2			;Primary start position
 
-			NEXTBASE		EQU		CURRBASE+TOT_CELLS+1	;Base address of Cell secondary cell table
-			NEXTSTART		EQU		NEXTBASE+COLS+2			;Secondary start position Base+COLS+2
+			NEXTBASE		EQU		CURRBASE+TOT_CELLS+1	;Base address of cell secondary cell table
+			NEXTSTART		EQU		NEXTBASE+COLS+2			;Secondary start position
 
 			UPPER_LEFT		EQU		COLS+2
 			UPPER_MID		EQU		COLS+1
@@ -54,109 +76,38 @@
 			BOTTOM_MID		EQU		COLS+1
 			BOTTOM_RIGHT	EQU		COLS+2
 
-
-;To work out top/bottom cells, I place a zero row one above and below the 1000 cell table. To
-;handle left/right cells, I place one zero column on the left. And for the bottom right cell
-;I have one extra byte.
-;
-;If Cell is alive it will be set to 1, if it is dead, it will be zero.
-
-; Memory Map With Upper/Lower/Left/Right buffer.  Total of 1108 Bytes for 40x25 matrix
-; X = potential cell position, 0 = always zero
-;   000102030405060708090A0B0C0D0E0F101112131415161718191A1B1C1D1E1F202122232425262728
-;00  0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-;01  0 X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X
-;02  0 X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X
-;03  0 X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X
-;04  0 X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X
-;05  0 X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X
-;06  0 X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X
-;07  0 X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X
-;08  0 X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X
-;09  0 X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X
-;0A  0 X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X
-;0B  0 X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X
-;0C  0 X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X
-;0D  0 X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X
-;0E  0 X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X
-;0F  0 X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X
-;10  0 X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X
-;11  0 X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X
-;12  0 X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X
-;13  0 X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X
-;14  0 X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X
-;15  0 X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X
-;16  0 X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X
-;17  0 X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X
-;18  0 X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X
-;19  0 X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X
-;1A  0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-;1B  0  <= needed for last bottom right check
-
-
-
 _main:		
-			;Set screen mode
-			LD		A, 22		;VDU 22
-			RST.LIL	10h
-			LD		A, SCRMODE	;Screen mode
-			RST.LIL	10h	
+			;Set screen mode, disable text cursor, clear text screen
+			LD		HL, init_screen
+			LD		BC, init_screen_end - init_screen
+			RST.LIL	18h
 			
-			;Disable text cursor
-			LD		A, 23		;VDU 23
-			RST.LIL	10h
-			LD		A, 1
-			RST.LIL	10h			
-			LD		A, 0
-			RST.LIL	10h			
-			
-			;Set Alive Cell character
+			;Define Alive cell custom character
 			LD		HL, s_CELL_CHAR
 			CALL	Print_String
 
-			LD		A,12		;Clear Text Screen
-			RST.LIL	10h
-
 START:
-			LD		HL,CURRBASE     ;Clear Current Cell data location to be all zeros
-			LD		DE,CURRBASE+1 
-			XOR		A               ;Set to Zero
-			LD		(HL),A 
-			LD		BC,TOT_CELLS    ;Cells to be cleared
-			LDIR					;Do the Copy
-			LD		HL,NEXTBASE		;Clear Next Cell data location to be all zeros
-			LD		DE,NEXTBASE+1
-			XOR		A				;Set to Zero
-			LD		(HL),A 
-			LD		BC,TOT_CELLS	;1108 cells to be cleared
-			LDIR					;Do the Copy
-
-NEWCELLS:
-			CALL	LOAD_RANDOM		;Initialize cell data with random values
-			CALL	PRINT_CELLS		
+			CALL	clear_cells
+			CALL	load_random		;Initialize cell data with random values
 
 LIFE:
-			CALL	CONWAY			;Do Conway Rules on current cells
-
-			CALL	PRINT_CELLS		
-			CALL	PRINT_STATUSLINE
+			CALL	print_cells
+			CALL	conway			;Do Conway Rules on current cells
+			CALL	print_statusline
 			
-			;Loop until key pressed			
-			MOSCALL	mos_getkey
+			MOSCALL	mos_getkey		;Loop until key pressed
 			OR		A 		
 			JR		Z, LIFE
-			
 			CP		ESC				;Escape pressed?
-			JR		NZ,LIFE			;Key pressed but not Escape, reload new random cells
-
+			JR		NZ,LIFE			;Key pressed but not Escape
+		
 			LD		HL, s_LIFE_END	;Escape pressed, clean up and exit
 			LD		BC, 0
 			LD		A, 0
 			RST.LIS	18h
-											
-	FINI:
+										
 			;Enable text cursor
-			LD		A, 23		;VDU 23
+			LD		A, 23			;VDU 23
 			RST.LIL	10h
 			LD		A, 1
 			RST.LIL	10h			
@@ -166,18 +117,102 @@ LIFE:
 			LD		HL, 0			;Return, Error code = 0
 			RET
 
-;Update the matrix with Conway Rules.  Nested For loop with Rows and Columns.
+clear_cells:
+			LD		HL,CURRBASE     ;Clear current cell data location to be all zeros
+			LD		DE,CURRBASE+1 
+			XOR		A               ;Set to 0 (Zero)
+			LD		(HL),A 
+			LD		BC,TOT_CELLS    ;Cells to be cleared
+			LDIR					;Do the copy
+			
+			LD		HL,NEXTBASE		;Clear next cell data location to be all zeros
+			LD		DE,NEXTBASE+1
+			XOR		A				;Set to 0 (Zero)
+			LD		(HL),A 
+			LD		BC,TOT_CELLS
+			LDIR					;Do the copy
+			RET
+			
+;Load random cells in memory. This interates through all cells and calls
+;an psuedo random routine. If that routine sets the carry flag then set the 
+;cell to Alive.
+load_random:
+			LD		HL,CURRSTART 
+			LD		B,ROWS 
+	COL:								;Columns
+			PUSH	BC 
+			LD		B,COLS 
+	ROW:								;Rows
+			CALL	RAND_8				;Call random routine
+			LD		A,01h				;Default to Alive
+			JR		C,STORECELL 
+			XOR		A					;Set to Dead
+	STORECELL:
+			LD		(HL),A				;Store the cell
+			INC		HL 
+			DJNZ	ROW 
+			INC		HL					;Skip left hand zero column
+			POP		BC 
+			DJNZ	COL 
+			RET							;Exit
+
+;Loop through the current array and print cells
+print_cells:
+			LD		A,31				;Home text cursor
+			RST.LIL	10h
+			LD		A,0
+			RST.LIL	10h
+			LD		A,0
+			RST.LIL	10h
+			
+			LD		IX,CURRSTART
+			LD		B,ROWS
+	NEWROW0:
+			PUSH	BC					;Save Registers
+			LD		B,COLS
+	NEWCOL0:
+			LD		A,(IX)
+			CALL	print_cell			;Print the value in (IX)
+
+			INC		IX						;Move to next Column
+			DJNZ	NEWCOL0					;Repeat until all columns are checked
+			INC		IX						;Skip left zero buffer
+			POP		BC 
+			;Print CR/LF after each row
+			LD		D, A
+			LD		A, 0Dh
+			RST.LIS	10h
+			LD		A, 0Ah
+			RST.LIS	10h
+			LD		A, D
+			DJNZ	NEWROW0					;Repeat until all rows are checked
+			
+			RET								;Exit			
+			
+;Print a cell, if alive, blank if dead
+print_cell:
+			LD		C,A
+			CP 		01h						;Is cell value == 1?
+			LD 		A, 20h		
+			JR 		NZ,$F
+			LD 		A, 130
+	$$:		RST.LIS 10h
+			LD 		A,C
+			RET							;Exit
+
+;Update the matrix with Conway Rules.  
+;Nested For-loop with Rows and Columns.
 ;The basic cell rules are:
-;
 ;    * Any live cell with two or three live neighbours survives.
 ;    * Any dead cell with three live neighbours becomes a live cell.
 ;    * All other live cells die in the next generation. Similarly, all other dead cells stay dead.
-CONWAY:
+;
+conway:
 			LD		IX,CURRSTART
 			LD		HL,NEXTSTART
 			LD		B,ROWS
 	NEWROW:
-			PUSH	BC					;Save Registers
+			PUSH	BC						;Save Registers
 			LD		B,COLS
 	NEWCOL:
 			;Check the current cell and update count on number of live cells.  Use IX to
@@ -225,77 +260,8 @@ CONWAY:
 
 			RET								;Exit
 			
-
-;Load random cells in memory. This interates through all cells and calls
-;an psuedo random routine. If that routine sets the carry flag then set the 
-;cell to Alive.
-LOAD_RANDOM:
-			LD		HL,CURRSTART 
-			LD		B,ROWS 
-	COL:								;Columns
-			PUSH	BC 
-			LD		B,COLS 
-	ROW:								;Rows
-			CALL	RAND_8				;Call random routine
-			LD		A,01h				;Default to Alive
-			JR		C,STORECELL 
-			XOR		A					;Set to Dead
-	STORECELL:
-			LD		(HL),A				;Store the cell
-			INC		HL 
-			DJNZ	ROW 
-			INC		HL					;Skip left hand zero column
-			POP		BC 
-			DJNZ	COL 
-			RET							;Exit
-
-;Loop through the current array and print cells
-PRINT_CELLS:
-			LD		A,31				;Home text cursor
-			RST.LIL	10h
-			LD		A,0
-			RST.LIL	10h
-			LD		A,0
-			RST.LIL	10h
-			
-			LD      IX,CURRSTART 
-			LD		B,ROWS
-	col_loop:
-			PUSH	BC
-			LD		B,COLS
-			
-	row_loop:
-			LD		A,(IX)
-			CALL	Print_Cell			;Print the value in (IX)
-		
-			INC		IX
-			DJNZ	row_loop
-
-			;Print CR/LF after each row
-			LD		D, A
-			LD		A, 0Dh
-			RST.LIS	10h
-			LD		A, 0Ah
-			RST.LIS	10h
-			LD		A, D
-			
-			POP		BC
-			DJNZ	col_loop
-			RET							;Exit
-
-;Print a cell, if alive, blank if dead
-Print_Cell:
-			LD C,A
-			CP 01h
-			LD A, 20h
-			JR NZ,$F
-			LD A, 130
-	$$:		RST.LIS 10h
-			LD A,C
-			RET							;Exit
-
 ;Print generation count at bottom of screen
-PRINT_STATUSLINE:
+print_statusline:
 			LD		A, 31				;Move cursor to status line
 			RST.LIL	10h
 			LD		A, 0
@@ -363,29 +329,29 @@ Print_Decimal:
 			PUSH	IY
 			PUSH	DE
 			PUSH 	BC
-			LD	IY, Num_Table
-			LD	B, 6		; Consider 6 digits
-			LD	C, 6		; Leading zero counter, reaches 1 if sixth digit sill 0.		; 
+			LD		IY, Num_Table
+			LD		B, 6		; Consider 6 digits
+			LD		C, 6		; Leading zero counter, reaches 1 if sixth digit sill 0.		; 
 	Print_Dec1:
-			LD	DE, (IY+0) 	; Take next power of 10.
-			LEA	IY, IY+4
-			LD	A, '0'-1
-	$$:		INC	A
+			LD		DE, (IY+0) 	; Take next power of 10.
+			LEA		IY, IY+4
+			LD		A, '0'-1
+	$$:		INC		A
 			AND 	A	
 			SBC 	HL, DE		; Repeatedly subtract power of 10 until carry
-			JR	NC, $B
-			ADD	HL, DE		; Undo the last subtract that caused carry					
-			CP	'0'
-			JR	NZ, $F		; Don't print leading zero			
-			DEC	C	
-			JR	NZ, Print_Dec2	; But do print 0 if it's the units digit.
+			JR		NC, $B
+			ADD		HL, DE		; Undo the last subtract that caused carry					
+			CP		'0'
+			JR		NZ, $F		; Don't print leading zero			
+			DEC		C	
+			JR		NZ, Print_Dec2	; But do print 0 if it's the units digit.
 	$$:		RST.LIL	10h
-			LD	C, 1		; Make sure the next digit will be printed.
+			LD		C, 1		; Make sure the next digit will be printed.
 	Print_Dec2:
 			DJNZ	Print_Dec1
 			POP 	BC
-			POP	DE
-			POP	IY
+			POP		DE
+			POP		IY
 			RET							;Exit
 
 Num_Table	DL	100000
@@ -395,22 +361,26 @@ Num_Table	DL	100000
 			DL	10
 			DL	1
 
+Curr_Row	DB	0
+Curr_Col	DB	0
+
 ; Text strings
 ;
 s_LIFE_END:	DB 	"\n\rFinished\n\r", 0
 s_cr_lf:	DB	"\n\r", 0
 s_cr:		DB	"\r", 0
-s_HOME		DB	30,0,0
-s_STATUS	DB	"Generation: ", 0
+s_HOME:		DB	30,0,0
+s_STATUS:	DB	"Generation: ", 0
 
-s_CELL_CHAR DB	23,130,18h,3Ch,42h,DBh,DBh,42h,3Ch,18h
+s_CELL_CHAR: DB	23,130,18h,3Ch,42h,DBh,DBh,42h,3Ch,18h
 
-GENERATION	DB	0
+GENERATION:	DB	0h,0h,0h
 
-_MATRIX_START:
+init_screen:
+	db 22, 3
+	db 23, 1, 0
+	db 12
+init_screen_end:
 	
-; RAM
-; 
-			DEFINE	LORAM, SPACE = ROM
-			SEGMENT LORAM
 			
+_MATRIX_START:
