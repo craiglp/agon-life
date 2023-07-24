@@ -47,17 +47,16 @@
 
 			.ASSUME	ADL = 1	
 
-			INCLUDE	"equs.inc"
 			INCLUDE "mos_api.inc"
 
 			SEGMENT CODE
 
 			XDEF	_main
 
-			SCRMODE			EQU		3h						;Screen Mode 3
+			SCRMODE			EQU		2h						;Screen Mode 3
 
 			ROWS			EQU		57						;Rows on screen -2 rows for status line
-			COLS			EQU		79						;Columns on screen
+			COLS			EQU		78						;Columns on screen
 
 			TOT_CELLS		EQU		(ROWS+2)*(COLS+1)+1		;Total number of cells
 
@@ -75,6 +74,10 @@
 			BOTTOM_LEFT		EQU		COLS
 			BOTTOM_MID		EQU		COLS+1
 			BOTTOM_RIGHT	EQU		COLS+2
+			
+			ESC				EQU		1Bh
+			CtrlC			EQU		03h
+
 
 _main:		
 			;Set screen mode, disable text cursor, clear text screen
@@ -86,21 +89,21 @@ _main:
 			LD		HL, s_CELL_CHAR
 			CALL	Print_String
 
-START:
+start:
 			CALL	clear_cells
 			CALL	load_random		;Initialize cell data with random values
-
-LIFE:
+			
+life:
 			CALL	print_cells
 			CALL	conway			;Do Conway Rules on current cells
 			CALL	print_statusline
-			
+
 			MOSCALL	mos_getkey		;Loop until key pressed
 			OR		A 		
-			JR		Z, LIFE
+			JR		Z, life			;No key pressed
 			CP		ESC				;Escape pressed?
-			JR		NZ,LIFE			;Key pressed but not Escape
-		
+			JR		NZ,life			;Key pressed but not Escape
+
 			LD		HL, s_LIFE_END	;Escape pressed, clean up and exit
 			LD		BC, 0
 			LD		A, 0
@@ -118,6 +121,11 @@ LIFE:
 			RET
 
 clear_cells:
+			LD		A, 0
+			LD		(GENERATION), A
+			LD		(GENERATION+1), A
+			LD		(GENERATION+2), A
+			
 			LD		HL,CURRBASE     ;Clear current cell data location to be all zeros
 			LD		DE,CURRBASE+1 
 			XOR		A               ;Set to 0 (Zero)
@@ -135,7 +143,7 @@ clear_cells:
 			
 ;Load random cells in memory. This interates through all cells and calls
 ;an psuedo random routine. If that routine sets the carry flag then set the 
-;cell to Alive.
+;cell to Alive. TODO: This needs work, not random enough
 load_random:
 			LD		HL,CURRSTART 
 			LD		B,ROWS 
@@ -165,30 +173,45 @@ print_cells:
 			LD		A,0
 			RST.LIL	10h
 			
+			PUSH	DE					;Save DE registers to use for plotting cells
+			
 			LD		IX,CURRSTART
 			LD		B,ROWS
 	NEWROW0:
-			PUSH	BC					;Save Registers
-			LD		B,COLS
+			LD		D,B
+			PUSH	BC					;Save Registers, save current row value
+			LD		B,COLS				;Get the # of columns
 	NEWCOL0:
+			LD		E,B
 			LD		A,(IX)
-			CALL	print_cell			;Print the value in (IX)
+			
+			CALL	plot_cell
+			
+			INC		IX					;Move to next Column
+			DJNZ	NEWCOL0				;Repeat until all columns are printed
+			INC		IX					;Skip left zero buffer
+			POP		BC					;Pop the current row value
+			
+			DJNZ	NEWROW0				;Repeat until all rows are printed
+			
+			POP		DE					;Restore DE registers
+			RET							;Exit			
+			
+;Print the cell at E,D (x,y)
+plot_cell:
+			PUSH	AF
 
-			INC		IX						;Move to next Column
-			DJNZ	NEWCOL0					;Repeat until all columns are checked
-			INC		IX						;Skip left zero buffer
-			POP		BC 
-			;Print CR/LF after each row
-			LD		D, A
-			LD		A, 0Dh
-			RST.LIS	10h
-			LD		A, 0Ah
-			RST.LIS	10h
-			LD		A, D
-			DJNZ	NEWROW0					;Repeat until all rows are checked
-			
-			RET								;Exit			
-			
+			LD		A, 31				;Move cursor to x,y
+			RST.LIL	10h
+			LD		A, E 				;Column
+			RST.LIL	10h
+			LD		A, D				;Row
+			RST.LIL	10h
+
+			POP		AF
+			call print_cell
+			RET							;Exit
+
 ;Print a cell, if alive, blank if dead
 print_cell:
 			LD		C,A
@@ -271,15 +294,52 @@ print_statusline:
 
 			LD		HL, s_STATUS		;Print generation count text
 			CALL	Print_String
-			LD		HL, (GENERATION)	;Print generation count
-			CALL	Print_Decimal
-
-			LD		A,(GENERATION)		;Increment generation count
-			INC		A
-			LD		(GENERATION),A
+			LD		HL, (GENERATION)	
+			INC		HL					;Increment generation count
+			LD		(GENERATION), HL
+			CALL	print_decimal		;Print generation count
 			
 			RET							;Exit
+
+print_vkeycode:
+			LD		C,A
+
+			LD		A, 31				;Move cursor to status line
+			RST.LIL	10h
+			LD		A, 0
+			RST.LIL	10h
+			LD		A, ROWS+2
+			RST.LIL	10h
 			
+			LD		A,C
+			CALL	print_hex8
+			
+			RET							;Exit
+
+print_xy:
+			LD		A, 31
+			RST.LIL	10h
+			LD		A, 0
+			RST.LIL	10h
+			LD		A, ROWS+2
+			RST.LIL	10h
+
+			LD		A,H
+			CALL	print_hex8
+			
+			
+			LD		A, 31
+			RST.LIL	10h
+			LD		A, Ah
+			RST.LIL	10h
+			LD		A, ROWS+2
+			RST.LIL	10h
+			
+			LD		A,L
+			CALL	print_hex8
+			
+			RET							;Exit
+
 ; Returns pseudo random 8 bit number in A. Only affects A.
 ; (r_seed) is the byte from which the number is generated and MUST be
 ; initialised to a non zero value or this function will always return
@@ -301,7 +361,7 @@ RAND_8:
 
 ; Print an 8-bit HEX number
 ; A: Number to print
-Print_Hex8:
+print_hex8:
 			LD		C,A
 			RRA 
 			RRA 
@@ -325,7 +385,7 @@ Print_String:
 
 ; Print a decimal number (less than 1000000)
 ; Input: HL 24-bit number to print.
-Print_Decimal:	
+print_decimal:	
 			PUSH	IY
 			PUSH	DE
 			PUSH 	BC
@@ -371,11 +431,14 @@ s_cr_lf:	DB	"\n\r", 0
 s_cr:		DB	"\r", 0
 s_HOME:		DB	30,0,0
 s_STATUS:	DB	"Generation: ", 0
-
+	
 s_CELL_CHAR: DB	23,130,18h,3Ch,42h,DBh,DBh,42h,3Ch,18h
 
 GENERATION:	DB	0h,0h,0h
 
+keycount:	DB	0h	;current key count
+sysvars:	DB	0h, 0h
+	
 init_screen:
 	db 22, 3
 	db 23, 1, 0

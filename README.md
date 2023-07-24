@@ -80,9 +80,10 @@ Each generation is evaluated when you hit a key. Hitting Escape will exit.
 TODO: 
 * ~~Custom icon/image for 'live' cells~~
 * Make matrix 'infinite', full wrap-around in all directions
-* Plot matrix properly, rather than ~~clear screen~~, print row by row
+* ~~Plot matrix properly, rather than clear screen, print row by row
 * ~~Generation counter~~
 * Full run, with keyboard scan. Run until stopped, rather than one generation per keystroke
+* Need a more 'random' random number generator
 * User config of matrix start state 
 
 
