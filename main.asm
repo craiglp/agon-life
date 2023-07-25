@@ -76,7 +76,6 @@
 			BOTTOM_RIGHT	EQU		COLS+2
 			
 			ESC				EQU		1Bh
-			CtrlC			EQU		03h
 
 
 _main:		
@@ -87,7 +86,7 @@ _main:
 			
 			;Define Alive cell custom character
 			LD		HL, s_CELL_CHAR
-			CALL	Print_String
+			CALL	print_string
 
 start:
 			CALL	clear_cells
@@ -121,10 +120,8 @@ life:
 			RET
 
 clear_cells:
-			LD		A, 0
-			LD		(GENERATION), A
-			LD		(GENERATION+1), A
-			LD		(GENERATION+2), A
+			LD		HL, 0
+			LD		(GENERATION), HL
 			
 			LD		HL,CURRBASE     ;Clear current cell data location to be all zeros
 			LD		DE,CURRBASE+1 
@@ -186,6 +183,7 @@ print_cells:
 			LD		A,(IX)
 			
 			CALL	plot_cell
+			CALL	print_cell
 			
 			INC		IX					;Move to next Column
 			DJNZ	NEWCOL0				;Repeat until all columns are printed
@@ -209,13 +207,12 @@ plot_cell:
 			RST.LIL	10h
 
 			POP		AF
-			call print_cell
 			RET							;Exit
 
 ;Print a cell, if alive, blank if dead
 print_cell:
 			LD		C,A
-			CP 		01h						;Is cell value == 1?
+			CP 		01h					;Is cell value == 1?
 			LD 		A, 20h		
 			JR 		NZ,$F
 			LD 		A, 130
@@ -293,7 +290,7 @@ print_statusline:
 			RST.LIL	10h
 
 			LD		HL, s_STATUS		;Print generation count text
-			CALL	Print_String
+			CALL	print_string
 			LD		HL, (GENERATION)	
 			INC		HL					;Increment generation count
 			LD		(GENERATION), HL
@@ -301,83 +298,7 @@ print_statusline:
 			
 			RET							;Exit
 
-print_vkeycode:
-			LD		C,A
-
-			LD		A, 31				;Move cursor to status line
-			RST.LIL	10h
-			LD		A, 0
-			RST.LIL	10h
-			LD		A, ROWS+2
-			RST.LIL	10h
-			
-			LD		A,C
-			CALL	print_hex8
-			
-			RET							;Exit
-
-print_xy:
-			LD		A, 31
-			RST.LIL	10h
-			LD		A, 0
-			RST.LIL	10h
-			LD		A, ROWS+2
-			RST.LIL	10h
-
-			LD		A,H
-			CALL	print_hex8
-			
-			
-			LD		A, 31
-			RST.LIL	10h
-			LD		A, Ah
-			RST.LIL	10h
-			LD		A, ROWS+2
-			RST.LIL	10h
-			
-			LD		A,L
-			CALL	print_hex8
-			
-			RET							;Exit
-
-; Returns pseudo random 8 bit number in A. Only affects A.
-; (r_seed) is the byte from which the number is generated and MUST be
-; initialised to a non zero value or this function will always return
-; zero. Also r_seed must be in RAM, you can see why......			
-RAND_8:
-			LD	A,(r_seed)	; get seed
-			AND	#B8h		; mask non feedback bits
-			SCF				; set carry
-			JP	PO,no_clr	; skip clear if odd
-			CCF				; complement carry (clear it)
-	no_clr:
-			LD	A,(r_seed)	; get seed back
-			RLA				; rotate carry into byte
-			LD	(r_seed),A	; save back for next prn
-			RET				;Exit
-	r_seed:
-			DB	254			; prng seed byte (must not be zero)
-	
-
-; Print an 8-bit HEX number
-; A: Number to print
-print_hex8:
-			LD		C,A
-			RRA 
-			RRA 
-			RRA 
-			RRA 
-			CALL	$F 
-			LD		A,C 
-	$$:		AND		0Fh
-			ADD		A,90h
-			DAA
-			ADC		A,40h
-			DAA
-			RST.LIS	10h
-			RET							;Exit
-			
-Print_String:
+print_string:
 			LD		BC, 0
 			LD		A, 0
 			RST.LIS	18h
@@ -424,12 +345,29 @@ Num_Table	DL	100000
 Curr_Row	DB	0
 Curr_Col	DB	0
 
+; Returns pseudo random 8 bit number in A. Only affects A.
+; (r_seed) is the byte from which the number is generated and MUST be
+; initialised to a non zero value or this function will always return
+; zero. Also r_seed must be in RAM, you can see why......			
+RAND_8:
+			LD	A,(r_seed)	; get seed
+			AND	#B8h		; mask non feedback bits
+			SCF				; set carry
+			JP	PO,no_clr	; skip clear if odd
+			CCF				; complement carry (clear it)
+	no_clr:
+			LD	A,(r_seed)	; get seed back
+			RLA				; rotate carry into byte
+			LD	(r_seed),A	; save back for next prn
+			RET				;Exit
+	r_seed:
+			DB	254			; prng seed byte (must not be zero)
+	
+
+
 ; Text strings
 ;
 s_LIFE_END:	DB 	"\n\rFinished\n\r", 0
-s_cr_lf:	DB	"\n\r", 0
-s_cr:		DB	"\r", 0
-s_HOME:		DB	30,0,0
 s_STATUS:	DB	"Generation: ", 0
 	
 s_CELL_CHAR: DB	23,130,18h,3Ch,42h,DBh,DBh,42h,3Ch,18h

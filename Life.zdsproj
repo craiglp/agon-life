@@ -1,12 +1,10 @@
-<project type="Executable" project-type="Assembly Only" configuration="Release" created-by="d:5.3.0:19052909" modified-by="d:5.3.0:23020901" ZDSII="ZDSII - eZ80Acclaim! 5.3.5 (Build 23020901)">
+<project type="Executable" project-type="Assembly Only" configuration="Debug" created-by="d:5.3.0:19052909" modified-by="d:5.3.0:23020901" ZDSII="ZDSII - eZ80Acclaim! 5.3.5 (Build 23020901)">
 <cpu>eZ80F92</cpu>
 
 <!-- file information -->
 <files>
 <file filter-key="">.\init.asm</file>
 <file filter-key="">.\main.asm</file>
-<file filter-key="">.\output.asm</file>
-<file filter-key="">..\..\agon-mos\src\mos_api.inc</file>
 </files>
 
 <!-- configuration information -->

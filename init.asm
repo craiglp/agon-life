@@ -198,3 +198,8 @@ _set_aix24:		PUSH.LIL	IX			; Stick IX onto SPL
 ; Storage for the argv array pointers
 ;
 argv_ptrs:		BLKP	argv_ptrs_max, 0		; Storage for the argv array pointers
+
+; RAM
+; 
+			DEFINE	LORAM, SPACE = ROM
+			SEGMENT LORAM
