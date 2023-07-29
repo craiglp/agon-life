@@ -3,15 +3,14 @@
 ; Author:	Craig Patterson
 ; Created:	06/30/2023
 
-; Conway's Game of Life for Amstrad CPC
+; Conway's Game of Life for Agon Light
 ; -------------------------------------
-;(Fast Version)
-;
-; Amstrad CPC version written by Brian Chiha
-; brian.chiha@gmail.com  -- Mar 2021
 ;
 ; Agon Light version written by Craig Patterson
 ; craiglp@gmail.com -- Jun 2023
+;
+; Amstrad CPC version written by Brian Chiha
+; brian.chiha@gmail.com  -- Mar 2021
 ;
 ; Game of Life is a cellular automation simulation.  Each cell evolves based on the number
 ; of cells that surround it.  The basic cell rules are:
@@ -91,18 +90,21 @@ _main:
 start:
 			CALL	clear_cells
 			CALL	load_random		;Initialize cell data with random values
-			
 life:
+			CALL	print_statusline
 			CALL	print_cells
 			CALL	conway			;Do Conway Rules on current cells
-			CALL	print_statusline
 
-			MOSCALL	mos_getkey		;Loop until key pressed
-			OR		A 		
-			JR		Z, life			;No key pressed
-			CP		ESC				;Escape pressed?
-			JR		NZ,life			;Key pressed but not Escape
-
+			MOSCALL	mos_sysvars		;get the sysvars location - consider saving IX for speed
+			ld.lil	a,(IX+sysvar_vkeycount)	;check if any key has been pressed
+			ld	hl,keycount
+			cp	(hl)						;compare against keycount for change
+			jr	z, life
+			ld	(hl),a						;update keycount
+			ld.lil	a,(IX+sysvar_keyascii)	;fetch character in queue
+			cp	ESC							;is it Escape
+			jr	nz, life
+						
 			LD		HL, s_LIFE_END	;Escape pressed, clean up and exit
 			LD		BC, 0
 			LD		A, 0
@@ -118,7 +120,7 @@ life:
 
 			LD		HL, 0			;Return, Error code = 0
 			RET
-
+	
 clear_cells:
 			LD		HL, 0
 			LD		(GENERATION), HL
@@ -165,13 +167,6 @@ load_random:
 
 ;Loop through the current array and print cells
 print_cells:
-			LD		A,31				;Home text cursor
-			RST.LIL	10h
-			LD		A,0
-			RST.LIL	10h
-			LD		A,0
-			RST.LIL	10h
-			
 			PUSH	DE					;Save DE registers to use for plotting cells
 			
 			LD		IX,CURRSTART
@@ -197,7 +192,7 @@ print_cells:
 			POP		DE					;Restore DE registers
 			RET							;Exit			
 			
-;Print the cell at E,D (x,y)
+;Move to the cell at E,D (x,y)
 plot_cell:
 			PUSH	AF
 
