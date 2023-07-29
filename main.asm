@@ -148,7 +148,9 @@ load_random:
 			PUSH	BC 
 			LD		B,COLS 
 	ROW:								;Rows
-			CALL	RAND_8				;Call random routine
+			PUSH	HL
+			CALL	rnd				    ;Call random routine
+			POP		HL
 			LD		A,01h				;Default to Alive
 			JR		C,STORECELL 
 			XOR		A					;Set to Dead
@@ -345,24 +347,45 @@ Num_Table	DL	100000
 Curr_Row	DB	0
 Curr_Col	DB	0
 
-; Returns pseudo random 8 bit number in A. Only affects A.
-; (r_seed) is the byte from which the number is generated and MUST be
-; initialised to a non zero value or this function will always return
-; zero. Also r_seed must be in RAM, you can see why......			
-RAND_8:
-			LD	A,(r_seed)	; get seed
-			AND	#B8h		; mask non feedback bits
+; Sets or clears carry flag to do a "coin flip"
+rnd:    
+			PUSH 	BC
+
+			ld   bc,0       ; i
+			ld   a,c
+			inc  a
+			and  7
+			ld   (rnd+1),a  ; i = ( i + 1 ) & 7
+			ld   hl,table
+			add  hl,bc
+			ld   c,(hl)     ; y = q[i]
+			ex   de,hl
+			ld   h,c        ; t = 256 * y
+			ld   l,b
+			sbc  hl,bc      ; t = 255 * y
+			sbc  hl,bc      ; t = 254 * y
+			sbc  hl,bc      ; t = 253 * y
+	car:
+			ld   c,0        ; c
+			add  hl,bc      ; t = 253 * y + c
+			ld   a,h        ; c = t / 256
+			ld   (car+1),a
+			ld   a,l        ; x = t % 256
+			cpl             ; x = (b-1) - x = -x - 1 = ~x + 1 - 1 = ~x
+			ld   (de),a
+
+			AND	#B8h		; mask non feedback bit
 			SCF				; set carry
-			JP	PO,no_clr	; skip clear if odd
+			JP	PO, $F		; skip clear if odd
 			CCF				; complement carry (clear it)
-	no_clr:
-			LD	A,(r_seed)	; get seed back
-			RLA				; rotate carry into byte
-			LD	(r_seed),A	; save back for next prn
-			RET				;Exit
-	r_seed:
-			DB	254			; prng seed byte (must not be zero)
-	
+	$$:
+			RLA
+
+			POP 	BC
+		    ret
+
+table
+    db   82,97,120,111,102,116,20,12
 
 
 ; Text strings

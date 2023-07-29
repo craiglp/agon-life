@@ -30,9 +30,9 @@ ptn_Child1=ViewFrame-0
 DocPathName=.\main.asm
 DocTemplateIndex=0
 DocumentString=IDE.Document
-IsActiveChildFrame=True
+IsActiveChildFrame=False
 IsFrameVisible=True
-WindowPlacement=MCAAAAAACAAAAAAADAAAAAAAPPPPPPPPPPPPPPPPIPPPPPPPBOPPPPPPEDAAAAAAEDAAAAAAIEFAAAAAIBDAAAAA
+WindowPlacement=MCAAAAAAAAAAAAAABAAAAAAAPPPPPPPPPPPPPPPPIPPPPPPPBOPPPPPPEDAAAAAAEDAAAAAAIEFAAAAAIBDAAAAA
 
 [WorkState_v1_2.Frames.ChildFrames.Document-2]
 ptn_Child1=ViewFrame-0
@@ -60,21 +60,21 @@ WindowPlacement=MCAAAAAAAAAAAAAABAAAAAAAPPPPPPPPPPPPPPPPIPPPPPPPBOPPPPPPGLAAAAAA
 ptn_Child1=ViewFrame-0
 
 [WorkState_v1_2.Frames.ChildFrames.Document-4.ViewFrame-0]
-DocPathName=.\output.asm
-DocTemplateIndex=0
-DocumentString=IDE.Document
-IsActiveChildFrame=False
-IsFrameVisible=True
-WindowPlacement=MCAAAAAAAAAAAAAABAAAAAAAPPPPPPPPPPPPPPPPIPPPPPPPBOPPPPPPANAAAAAAANAAAAAAIHIAAAAABNDAAAAA
-
-[WorkState_v1_2.Frames.ChildFrames.Document-5]
-ptn_Child1=ViewFrame-0
-
-[WorkState_v1_2.Frames.ChildFrames.Document-5.ViewFrame-0]
 DocPathName=..\..\agon-mos\src\mos_api.inc
 DocTemplateIndex=0
 DocumentString=IDE.Document
 IsActiveChildFrame=False
 IsFrameVisible=True
 WindowPlacement=MCAAAAAAAAAAAAAABAAAAAAAPPPPPPPPPPPPPPPPIPPPPPPPBOPPPPPPMJAAAAAAMJAAAAAAEFDAAAAADIDAAAAA
+
+[WorkState_v1_2.Frames.ChildFrames.Document-5]
+ptn_Child1=ViewFrame-0
+
+[WorkState_v1_2.Frames.ChildFrames.Document-5.ViewFrame-0]
+DocPathName=.\README.md
+DocTemplateIndex=0
+DocumentString=IDE.Document
+IsActiveChildFrame=True
+IsFrameVisible=True
+WindowPlacement=MCAAAAAACAAAAAAADAAAAAAAPPPPPPPPPPPPPPPPIPPPPPPPBOPPPPPPMJAAAAAAMJAAAAAAKIDAAAAADIDAAAAA
 

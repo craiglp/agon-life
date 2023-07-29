@@ -14,6 +14,9 @@ Also, got inspiration from:<br>
 Conway's game of life by Joe Helmick (c)2019<br>
 https://gitlab.com/joe_helmick/life-rom
 
+Uses a CMWC (Complimentary-Multiply-With-Carry) random number generator based on:
+https://worldofspectrum.org/forums/discussion/39632/cmwc-random-number-generator-for-z80
+
  Game of Life is a cellular automation simulation.  Each cell evolves based on the number
  of cells that surround it.  The basic cell rules are:
 
@@ -33,40 +36,23 @@ I have one extra byte.
 
 If Cell is alive it will be set to 1, if it is dead, it will be zero.
 ```
- Memory Map With Upper/Lower/Left/Right buffer.  Total of 1108 Bytes for a 40x25 matrix
+ Memory Map With Upper/Lower/Left/Right buffer.
  X = potential cell position, 0 = always zero
 
-    0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 2 2 2 2 2 2 2 2 2
-    0 1 2 3 4 5 6 7 8 9 A B C D E F 0 1 2 3 4 5 6 7 8 9 A B C D E F 0 1 2 3 4 5 6 7 8
+    0 0 0 0 0 0 0 0 0 0  
+    0 1 2 3 4 5 6 7 8 9  
     
-00  0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-01  0 X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X
-02  0 X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X
-03  0 X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X
-04  0 X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X
-05  0 X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X
-06  0 X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X
-07  0 X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X
-08  0 X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X
-09  0 X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X
-0A  0 X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X
-0B  0 X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X
-0C  0 X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X
-0D  0 X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X
-0E  0 X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X
-0F  0 X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X
-10  0 X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X
-11  0 X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X
-12  0 X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X
-13  0 X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X
-14  0 X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X
-15  0 X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X
-16  0 X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X
-17  0 X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X
-18  0 X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X
-19  0 X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X
-1A  0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-1B  0  <= needed for last bottom right check
+00  0 0 0 0 0 0 0 0 0 0  
+01  0 X X X X X X X X X  
+02  0 X X X X X X X X X  
+03  0 X X X X X X X X X  
+04  0 X X X X X X X X X  
+05  0 X X X X X X X X X  
+06  0 X X X X X X X X X  
+07  0 X X X X X X X X X  
+08  0 X X X X X X X X X  
+09  0 X X X X X X X X X  
+0A  0 <= needed for last bottom right check
 ```
 
 Requires: <br>
@@ -83,7 +69,7 @@ TODO:
 * ~~Plot matrix properly, rather than clear screen, print row by row~~
 * ~~Generation counter~~
 * Full run, with keyboard scan. Run until stopped, rather than one generation per keystroke
-* Need a more 'random' random number generator
+* ~~Need a more 'random' random number generator~~
 * User config of matrix start state 
 
 
