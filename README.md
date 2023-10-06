@@ -18,12 +18,11 @@ Uses a CMWC (Complimentary-Multiply-With-Carry) random number generator based on
 https://worldofspectrum.org/forums/discussion/39632/cmwc-random-number-generator-for-z80
 
  Game of Life is a cellular automation simulation.  Each cell evolves based on the number
- of cells that surround it.  The basic cell rules are:
+ of cells that surround it.  The Conway Game of Life cell rules are:
 
     * Any live cell with two or three live neighbours survives.
     * Any dead cell with three live neighbours becomes a live cell.
     * All other live cells die in the next generation. Similarly, all other dead cells stay dead.
-
 
 Calcuation for next cells are done from memory starting at _MATRIX_START.  Current Base is 
 what is displayed
@@ -59,18 +58,21 @@ Requires: <br>
 MOS 1.03 <br>
 VDP 1.03
 
+(Tested successfully with MOS 1.04RC2, and VDP 1.04RC2)
+
 Each generation is evaluated until you press Escape to exit.
 
-<<< Much more to come >>>
+<<< Road Map >>>
 
-TODO: 
 * ~~Custom icon/image for 'live' cells~~
-* Make matrix 'infinite', full wrap-around in all directions
+* ~~Make matrix 'infinite', full wrap-around in all directions~~ (Not doing)
 * ~~Plot matrix properly, rather than clear screen, print row by row~~
 * ~~Generation counter~~
 * ~~Full run, with keyboard scan. Run until stopped, rather than one generation per keystroke~~
 * ~~Need a more 'random' random number generator~~
-* User config of matrix start state 
+* User config of matrix start state
+** Allow user to select Cellular Automata Ruleset to run other variations of Life
+** http://www.mirekw.com/ca/rullex_life.html
 
 
 
