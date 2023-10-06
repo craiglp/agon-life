@@ -71,8 +71,8 @@ Each generation is evaluated until you press Escape to exit.
 * ~~Full run, with keyboard scan. Run until stopped, rather than one generation per keystroke~~
 * ~~Need a more 'random' random number generator~~
 * User config of matrix start state
-** Allow user to select Cellular Automata Ruleset to run other variations of Life
-** http://www.mirekw.com/ca/rullex_life.html
+* Allow user to select Cellular Automata Ruleset to run other variations of Life
+* http://www.mirekw.com/ca/rullex_life.html
 
 
 
