@@ -18,11 +18,20 @@ Uses a CMWC (Complimentary-Multiply-With-Carry) random number generator based on
 https://worldofspectrum.org/forums/discussion/39632/cmwc-random-number-generator-for-z80
 
  Game of Life is a cellular automation simulation.  Each cell evolves based on the number
- of cells that surround it.  The Conway Game of Life cell rules are:
+ of cells that surround it, it's neighborhood.  
+ 
+ The Conway Game of Life cell rules are:
 
     * Any live cell with two or three live neighbours survives.
     * Any dead cell with three live neighbours becomes a live cell.
     * All other live cells die in the next generation. Similarly, all other dead cells stay dead.
+
+These rules can be written in a form, S/B. Where S is the counts of surrounding neighbors necessary 
+for a cell to survive, and B is the counts of alive neighbors necessary for a cell to be born. Using
+this notation Conway's Life rule is 23/3
+
+There are a number of other rulesets that define other members of the "Life" family of cellular
+automata. 
 
 Calcuation for next cells are done from memory starting at _MATRIX_START.  Current Base is 
 what is displayed
