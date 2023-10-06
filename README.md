@@ -76,6 +76,8 @@ Each generation is evaluated until you press Escape to exit.
 
 
 
+# License
+
 Copyright 2023 Craig L. Patterson
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software
