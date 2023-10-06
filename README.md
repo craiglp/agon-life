@@ -62,7 +62,7 @@ VDP 1.03
 
 Each generation is evaluated until you press Escape to exit.
 
-##<<< Road Map >>>
+# <<< Road Map >>>
 
 * ~~Custom icon/image for 'live' cells~~
 * ~~Make matrix 'infinite', full wrap-around in all directions~~ (Not doing)
