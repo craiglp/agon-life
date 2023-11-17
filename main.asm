@@ -44,18 +44,18 @@
 ;0A  0  <= needed for last bottom right check
 
 
-			.ASSUME	ADL = 1	
+			.ASSUME	ADL = 1
 
 			INCLUDE "mos_api.inc"
-
+			
 			SEGMENT CODE
 
 			XDEF	_main
+			
+			SCRMODE			EQU		17						;Screen Mode 17
 
-			SCRMODE			EQU		2h						;Screen Mode 3
-
-			ROWS			EQU		57						;Rows on screen -2 rows for status line
-			COLS			EQU		78						;Columns on screen
+			ROWS			EQU		69						;Rows on screen -2 rows for status line
+			COLS			EQU		98						;Columns on screen
 
 			TOT_CELLS		EQU		(ROWS+2)*(COLS+1)+1		;Total number of cells
 
@@ -78,6 +78,7 @@
 			ZERO			EQU		30h
 			ENTER			EQU		0Dh
 			LETTERA			EQU		61h						;Capital A is 41h
+			LETTERV			EQU		77h
 
 _main:		
 			;Set screen mode, disable text cursor, clear text screen
@@ -85,13 +86,13 @@ _main:
 			LD		BC, init_screen_end - init_screen
 			RST.LIL	18h
 			
+			;Display menu of life configurations
 			call	print_menu
 			call	get_rule_choice
 			cp		ZERO
 			jp		z, stop
 			
-				jp stop
-				
+			;Clear the screen and init screen mode
 			LD		HL, init_screen
 			LD		BC, init_screen_end - init_screen
 			RST.LIL	18h
@@ -231,70 +232,6 @@ print_cell:
 			RET							;Exit
 
 
-;Update the matrix with Life Rules.  
-;Nested For-loop with Rows and Columns.
-;The basic cell rules are:
-;    * Any live cell with two or three live neighbours survives.
-;    * Any dead cell with three live neighbours becomes a live cell.
-;    * All other live cells die in the next generation. Similarly, all other dead cells stay dead.
-;
-process_rules:
-			LD		IX,CURRSTART
-			LD		HL,NEXTSTART
-			LD		B,ROWS
-	NEWROW:
-			PUSH	BC						;Save Registers
-			LD		B,COLS
-	NEWCOL:
-			;Check the current cell and count number of live cells in the neighborhood.
-			;Use IX to make checking easier, save count in A
-			LD		A,(IX-UPPER_LEFT)
-			ADD		A,(IX-UPPER_MID)
-			ADD		A,(IX-UPPER_RIGHT)
-			ADD		A,(IX-MID_LEFT)
-			ADD		A,(IX+MID_RIGHT)
-			ADD		A,(IX+BOTTOM_LEFT)
-			ADD		A,(IX+BOTTOM_MID)
-			ADD		A,(IX+BOTTOM_RIGHT)
-
-			;Move evaluation to a subroutine. Make it more generic. Have it reference a lookup
-			;table of rulesets. Return cell in D. A will contain the count of live cells in the
-			;neighborhood. 
-		EVALUATE:
-			;Evaluate surrounding cell count to create or destroy current cell
-			;This is the rules being applied for the cell
-			LD		D,01h					;Alive
-			CP		03h						;Compare A to 03h. Check if 3 cells around
-			JR		Z,STORE_CELL				;3 cells around current cell. Save Alive cell	
-			LD		D,00h					;Assume dead until found otherwise
-			CP		02h						;Check if 2 cells around
-			JR		NZ,STORE_CELL				;Save Dead cell if not 2
-			LD		A,(IX+0)				;Current Cell had only 2 cells around
-			AND		01h						;Keep it alive if already alive.
-			LD		D,A						;Load current cell in A
-
-
-		STORE_CELL:
-			;Save the new cell to the Next Cell Cycle table
-			LD		A,D						;D stores cell evaluation
-			LD		(HL),A					;Update cell on Next Matrix
-			INC		HL						;Move to next Column
-			INC		IX						;Move to next Column
-			DJNZ	NEWCOL					;Repeat until all columns are checked
-
-			INC		HL						;Skip left zero buffer
-			INC		IX						;Skip left zero buffer
-			POP		BC 
-			DJNZ	NEWROW					;Repeat until all rows are checked
-
-			;Copy next matrix to current
-			LD		HL,NEXTSTART
-			LD		DE,CURRSTART
-			LD		BC,TOT_CELLS			;All cells (include left zero buffer)
-			LDIR							;Do the Copy
-
-			RET								;Exit
-			
 ;Print generation count at bottom of screen
 print_statusline:
 			LD		A, 31				;Move cursor to status line
@@ -360,6 +297,7 @@ Num_Table	DL	100000
 Curr_Row	DB	0
 Curr_Col	DB	0
 
+
 ; Sets or clears carry flag to do a "coin flip"
 rnd:    
 			PUSH 	BC
@@ -398,138 +336,160 @@ rnd:
 		    ret
 
 print_menu:
-			ld HL, s_TITLE
-			call print_string
-			ld HL, s_CONWAY
-			call print_string
-			ld HL, s_2X2
-			call print_string
-			ld HL, s_34LIFE
-			call print_string
-			ld HL, s_AMOEBA
-			call print_string
-			ld HL, s_ASSIMILATION
-			call print_string
-			ld HL, s_COAGULATIONS
-			call print_string
-			ld HL, s_CORAL
-			call print_string
-			ld HL, s_DAYANDNIGHT
-			call print_string
-			ld HL, s_DIAMOEBA
-			call print_string
-			ld HL, s_FLAKES
-			call print_string
-			ld HL, s_GNARL
-			call print_string
-			ld HL, s_HIGHLIFE
-			call print_string
-			ld HL, s_LONGLIFE
-			call print_string
-			ld HL, s_MAZE
-			call print_string
-			ld HL, s_MAZECTRIC
-			call print_string
-			ld HL, s_MOVE
-			call print_string
-			ld HL, s_PSEUDOLIFE
-			call print_string
-			ld HL, s_REPLICATOR
-			call print_string
-			ld HL, s_SEEDS
-			call print_string
-			ld HL, s_SERVIETTES
-			call print_string
-			ld HL, s_STAINS
-			call print_string
-			ld HL, s_WALLEDCITIES
-			call print_string
-			ld HL, s_EXIT
-			call print_string
-			ld HL, s_PROMPT
+			ld HL, s_MENU
 			call print_string
 			ret
 
-;Get user menu choice and set ruleset
+;Get user menu choice and set ruleset into BC, b_SURVIVE and b_BORN
+;
 get_rule_choice:
 			MOSCALL	mos_getkey
 			OR	A 		
 			JP	Z, get_rule_choice		; Loop until key is pressed
-			;Check key pressed
 			CP	ZERO
 			JP	Z, DONE					; Zero pressed, exit program
 
-			CP	61h						; No valid choice selected, get another key
+			CP	LETTERA					; No valid choice selected, get another key
 			JP	M, get_rule_choice		; Keycode less than 'a'
-			CP	77h
+			CP	LETTERV
 			JP	P, get_rule_choice		; Keycode greater than 'v'
 			
 										; Valid choice - pass ruleset back to caller
-
-			SUB 61h						; Using lowercase letters, subtract value of 'a' to get index value
+			SUB LETTERA					; Using lowercase letters, subtract value of 'a' to get index value
 			LD	L, A					; Set the index value into HL
 			LD	H, 0h
-			SLA H   					; Shift left the contents of H, effectively multiplying it by 2
-			RL L    					; Rotate left the contents of L and take the carry from the H shift
-
-			LD	DE, _JMP_TABLE			; Load DE with the starting address of the jump table
+			
+			ADD HL, HL					; Align to the first byte
+			
+			LD	DE, _RULE_TABLE			; Load DE with the starting address of the jump table
 			ADD	HL, DE 					; Add index value to the jump table start address
-			
-										; Load HL with the value pointed to by the jump table 
-			LD DE, (HL)  				; Load the value from the memory location pointed to by HL into DE
-			LD HL, DE    				; Store the value from DE back into HL
-			
-			LD A, H
-			LD (b_SURVIVE), A
-			LD A, L
+
+
+			LD  BC, (HL)				; Get the value pointed to by HL, load into BC
+			LD	A, C
+			LD (b_SURVIVE), A			; Load b_SURVIVE with the value pointed to by the rule table			
+			LD	A, B
 			LD (b_BORN), A
-			
-			LD HL, (b_SURVIVE)
-			call print_decimal
-			LD HL, s_CR_LF
-			call print_string
-			LD HL, (b_BORN)
-			call print_decimal
-					
+				
 	DONE:	RET
+		
+;Update the matrix with Life Rules.  
+;Nested For-loop with Rows and Columns.
+;
+process_rules:
+			LD		IX,CURRSTART
+			LD		HL,NEXTSTART
+			LD		B,ROWS
+	NEWROW:
+			PUSH	BC						;Save Registers
+			LD		B,COLS
+	NEWCOL:
+			;Check the current cell and count number of live cells in the neighborhood.
+			;Use IX to make checking easier, save count in A
+			LD		A,(IX-UPPER_LEFT)
+			ADD		A,(IX-UPPER_MID)
+			ADD		A,(IX-UPPER_RIGHT)
+			ADD		A,(IX-MID_LEFT)
+			ADD		A,(IX+MID_RIGHT)
+			ADD		A,(IX+BOTTOM_LEFT)
+			ADD		A,(IX+BOTTOM_MID)
+			ADD		A,(IX+BOTTOM_RIGHT)
 
-; check_bit subroutine
-;
-; Input:
-;   A - first byte, with data represented by the position of each set bit
-;   B - second byte, containing a value of 0 to 8
-;
-; Output:
-;   A - 1 if the second byte value corresponds to a bit position in the first byte that is set, 0 otherwise
-;
-	check_bit:
+			;A will contain the count of live cells in the
+			;neighborhood. Return cell in D. 
 			
-	; Loop to shift the accumulator right by the value of register B
-	loop:
-			srl a
-			dec b
-			jr nz, loop
+			LD E, A
 
-	; Check if the least significant bit is set
-			and #01h
+		EVALUATE:
+			;Evaluate surrounding cell count to create or destroy current cell
+			;This is the rules being applied for the cell
+			
+			LD B, E
+			LD A, (b_SURVIVE)
+			CALL	checkBit
+			LD A, C
+			;A contains 1 if cell survives, 0 if not
+			
+			LD		D,01h					;Alive
+			CP		01h						;Compare A to 01h.
+			JR		Z,STORE_CELL			;Save Alive cell
 
-	; If it is set, return 1
-			jr nz, check_bit_return
-
-	; Otherwise, return 0
-	check_bit_exit:
-			ld a, #00h
-
-	; Return from the subroutine
-			ret
-
-	; Return label
-	check_bit_return:
-			ld a, #01h
-			ret
+			LD B, E
+			LD A, (b_BORN)
+			CALL	checkBit
+			LD A, C
+			;A contains 1 if cell is born, 0 if not
+			
+			LD		D,00h					;Assume dead until found otherwise
+			CP		01h						;Compare A to 01h.
+			JR		NZ,STORE_CELL			;Save Dead cell
+			LD		A,(IX+0)				
+			AND		01h						;Keep it alive if already alive.
+			LD		D,A						;Load current cell in A
 
 
-table
+		STORE_CELL:
+			;Save the new cell to the Next Cell Cycle table
+			LD		A,D						;D stores cell evaluation
+			LD		(HL),A					;Update cell on Next Matrix
+			INC		HL						;Move to next Column
+			INC		IX						;Move to next Column
+			DJNZ	NEWCOL					;Repeat until all columns are checked
+
+			INC		HL						;Skip left zero buffer
+			INC		IX						;Skip left zero buffer
+			POP		BC 
+			DJNZ	NEWROW					;Repeat until all rows are checked
+
+			;Copy next matrix to current
+			LD		HL,NEXTSTART
+			LD		DE,CURRSTART
+			LD		BC,TOT_CELLS			;All cells (include left zero buffer)
+			LDIR							;Do the Copy
+
+			RET								;Exit
+			
+
+; Subroutine to check if a bit position in a byte is set
+; Input:
+;   A - rule byte
+;   B - cell neighborhood count (bit position to check)
+; Output:
+;   C - 1 if bit position is set, 0 otherwise
+checkBit:
+ ; Save registers
+    push af
+    push bc
+
+    jp c, check_bit_position_not_set
+
+    ; Mask out all but the specified bit
+    rlca ; Rotate left with carry through, effectively shifting B to the leftmost position
+    rrca ; Rotate right with carry through, effectively shifting B back to its original position
+    and a, b
+
+    ; Check if the bit is set
+    jr nz, check_bit_position_set
+
+check_bit_position_not_set:
+    ld c, 0
+
+    ; Restore registers and return
+    pop bc
+    pop af
+    ret
+	
+check_bit_position_set:
+    ; Bit is set
+    ld c, 1
+
+    ; Restore registers and return
+    pop bc
+    pop af
+    ret
+	
+	
+table:
     db   82,97,120,111,102,116,20,12
 
 
@@ -539,7 +499,7 @@ s_CR_LF:	DB	"\n\r", 0
 s_LIFE_END:	DB 	"\n\rFinished\n\r", 0
 s_STATUS:	DB	"Generation: ", 0
 	
-s_CELL_CHAR: DB	23,130,18h,3Ch,42h,DBh,DBh,42h,3Ch,18h
+s_CELL_CHAR: DB	23,130,18h,3Ch,7Eh,FFh,FFh,7Eh,3Ch,18h
 
 GENERATION:	DB	0h,0h,0h
 
@@ -547,85 +507,86 @@ keycount:	DB	0h	;current key count
 sysvars:	DB	0h, 0h
 	
 init_screen:
-	db 22, 3
+	db 22, SCRMODE
 	db 23, 1, 0
 	db 12
 init_screen_end:
 
-s_TITLE:		DB	"\n\r\tLife Family Cellular Automata\n\r\n\r", 0
-s_CONWAY:		DB	"\tA. Conway's Life - Chaotic\n\r", 0
-s_2X2:			DB	"\tB. 2x2 - Chaotic\n\r", 0
-s_34LIFE:		DB	"\tC. 34 Life - Exploding\n\r", 0
-s_AMOEBA:		DB	"\tD. Amoeba - Chaotic\n\r", 0
-s_ASSIMILATION:	DB	"\tE. Assimilation - Stable\n\r", 0
-s_COAGULATIONS:	DB	"\tF. Coagulations - Exploding\n\r", 0
-s_CORAL:		DB	"\tG. Coral - Exploding\n\r", 0
-s_DAYANDNIGHT:	DB	"\tH. Day & Night - Stable\n\r", 0
-s_DIAMOEBA:		DB	"\tI. Diamoeba - Chaotic\n\r", 0
-s_FLAKES:		DB	"\tJ. Flakes - Expanding\n\r", 0
-s_GNARL:		DB	"\tK. Gnarl - Exploding\n\r", 0
-s_HIGHLIFE:		DB	"\tL. HighLife - Chaotic\n\r", 0
-s_LONGLIFE:		DB	"\tM. Long Life - Stable\n\r", 0
-s_MAZE:			DB	"\tN. Maze - Exploding\n\r", 0
-s_MAZECTRIC:	DB	"\tO. Mazectric - Exploding\n\r", 0
-s_MOVE:			DB	"\tP. Move - Stable\n\r", 0
-s_PSEUDOLIFE:	DB	"\tQ. Pseudo Life - Chaotic\n\r", 0
-s_REPLICATOR:	DB	"\tR. Replicator - Exploding\n\r", 0
-s_SEEDS:		DB	"\tS. Seeds - Exploding\n\r", 0
-s_SERVIETTES:	DB	"\tT. Serviettes - Exploding\n\r", 0
-s_STAINS:		DB	"\tU. Stains - Stable\n\r", 0
-s_WALLEDCITIES:	DB	"\tV. WalledCities - Stable\n\r\n\r", 0
-s_EXIT:			DB	"\t0. Exit the program\n\r\n\r", 0
-s_PROMPT:		DB	"\tPick a ruleset [A]: ", 0
+s_MENU:		
+	DB	"\n\r\tLife Family Cellular Automata\n\r\n\r"
+	DB	"\tA. Conway's Life - Chaotic\n\r"
+	DB	"\tB. 2x2 - Chaotic\n\r"
+	DB	"\tC. 34 Life - Exploding\n\r"
+	DB	"\tD. Amoeba - Chaotic\n\r"
+	DB	"\tE. Assimilation - Stable\n\r"
+	DB	"\tF. Coagulations - Exploding\n\r"
+	DB	"\tG. Coral - Exploding\n\r"
+	DB	"\tH. Day & Night - Stable\n\r"
+	DB	"\tI. Diamoeba - Chaotic\n\r"
+	DB	"\tJ. Flakes - Expanding\n\r"
+	DB	"\tK. Gnarl - Exploding\n\r"
+	DB	"\tL. HighLife - Chaotic\n\r"
+	DB	"\tM. Long Life - Stable\n\r"
+	DB	"\tN. Maze - Exploding\n\r"
+	DB	"\tO. Mazectric - Exploding\n\r"
+	DB	"\tP. Move - Stable\n\r"
+	DB	"\tQ. Pseudo Life - Chaotic\n\r"
+	DB	"\tR. Replicator - Exploding\n\r"
+	DB	"\tS. Seeds - Exploding\n\r"
+	DB	"\tT. Serviettes - Exploding\n\r"
+	DB	"\tU. Stains - Stable\n\r"
+	DB	"\tV. WalledCities - Stable\n\r\n\r"
+	DB	"\t0. Exit the program\n\r\n\r"
+	DB	"\tPick a ruleset [A]: ", 0
 
-_JMP_TABLE:		
-				DW	r_CONWAY
-				DW	r_2X2
-				DW	r_34LIFE
-				DW	r_AMOEBA
-				DW	r_ASSIMILATION
-				DW	r_COAGULATIONS
-				DW	r_CORAL
-				DW	r_DAYANDNIGHT
-				DW	r_DIAMOEBA
-				DW	r_FLAKES
-				DW	r_GNARL
-				DW	r_HIGHLIFE
-				DW	r_LONGLIFE
-				DW	r_MAZE
-				DW	r_MAZECTRIC
-				DW	r_MOVE
-				DW	r_PSEUDOLIFE
-				DW	r_REPLICATOR
-				DW	r_SEEDS
-				DW	r_SERVIETTES
-				DW	r_STAINS
-				DW	r_WALLEDCITIES
+_RULE_TABLE:		
+	DW	0604h	;00000110 00000100
+	DW	1324h	;00010011 00100100
+	DW	0C0Ch	;00001100 00001100
+	DW	9554h	;10010101 01010100
+	DW	781Ch	;01111000 00011100
+	DW	F6C4h	;11110110 11000100
+	DW	F804h	;11111000 00000100
+	DW	ECE4h	;11101100 11100100
+	DW	F0F4h	;11110000 11110100
+	DW	FF04h	;11111111 00000100
+	DW	0101h	;00000001 00000001
+	DW	0624h	;00000110 00100100
+	DW	101Ch	;00010000 00011100
+	DW	1F04h	;00011111 00000100
+	DW	0F04h	;00001111 00000100
+	DW	1AA4h	;00011010 10100100
+	DW	8654h	;10000110 01010100
+	DW	5555h	;01010101 01010101
+	DW	0002h	;00000000 00000010
+	DW	000Eh	;00000000 00001110
+	DW	F6E4h	;11110110 11100100
+	DW	1EF8h	;00011110 11111000
 
-r_CONWAY:		DB	06h,04h	;23/3
-r_2X2:			DB	13h,24h	;"125/36", 0
-r_34LIFE:		DB	0Ch,0Ch	;"34/34", 0
-r_AMOEBA:		DB	95h,54h	;"1358/357", 0
-r_ASSIMILATION:	DB	78h,1Ch	;"4567/345", 0
-r_COAGULATIONS:	DB	F6h,C4h	;"235678/378", 0
-r_CORAL:		DB	F8h,04h	;"45678/3", 0
-r_DAYANDNIGHT:	DB	ECh,E4h	;"34678/3678", 0
-r_DIAMOEBA:		DB	F0h,F4h	;"5678/35678", 0
-r_FLAKES:		DB	FFh,04h	;"012345678/3", 0
-r_GNARL:		DB	01h,01h	;"1/1", 0
-r_HIGHLIFE:		DB	06h,24h	;"23/36", 0
-r_LONGLIFE:		DB	10h,1Ch	;"5/345", 0
-r_MAZE:			DB	1Fh,04h	;"12345/3", 0
-r_MAZECTRIC:	DB	0Fh,04h	;"1234/3", 0
-r_MOVE:			DB	1Ah,A4h	;"245/368", 0
-r_PSEUDOLIFE:	DB	86h,54h	;"238/357", 0
-r_REPLICATOR:	DB	55h,55h	;"1357/1357", 0
-r_SEEDS:		DB	00h,02h	;"/2", 0
-r_SERVIETTES:	DB	00h,0Eh	;"/234", 0
-r_STAINS:		DB	F6h,E4h	;"235678/3678", 0
-r_WALLEDCITIES:	DB	1Eh,F8h	;"2345/45678", 0
-
-b_SURVIVE		DB	0h
 b_BORN			DB	0h
+b_SURVIVE		DB	0h
+
+;r_CONWAY:			DB	06h,04h	;23/3
+;r_2X2:				DB	13h,24h	;"125/36", 0
+;r_34LIFE:			DB	0Ch,0Ch	;"34/34", 0
+;r_AMOEBA:			DB	95h,54h	;"1358/357", 0
+;r_ASSIMILATION:	DB	78h,1Ch	;"4567/345", 0
+;r_COAGULATIONS:	DB	F6h,C4h	;"235678/378", 0
+;r_CORAL:			DB	F8h,04h	;"45678/3", 0
+;r_DAYANDNIGHT:		DB	ECh,E4h	;"34678/3678", 0
+;r_DIAMOEBA:		DB	F0h,F4h	;"5678/35678", 0
+;r_FLAKES:			DB	FFh,04h	;"012345678/3", 0
+;r_GNARL:			DB	01h,01h	;"1/1", 0
+;r_HIGHLIFE:		DB	06h,24h	;"23/36", 0
+;r_LONGLIFE:		DB	10h,1Ch	;"5/345", 0
+;r_MAZE:			DB	1Fh,04h	;"12345/3", 0
+;r_MAZECTRIC:		DB	0Fh,04h	;"1234/3", 0
+;r_MOVE:			DB	1Ah,A4h	;"245/368", 0
+;r_PSEUDOLIFE:		DB	86h,54h	;"238/357", 0
+;r_REPLICATOR:		DB	55h,55h	;"1357/1357", 0
+;r_SEEDS:			DB	00h,02h	;"/2", 0
+;r_SERVIETTES:		DB	00h,0Eh	;"/234", 0
+;r_STAINS:			DB	F6h,E4h	;"235678/3678", 0
+;r_WALLEDCITIES:	DB	1Eh,F8h	;"2345/45678", 0
 
 _MATRIX_START:
