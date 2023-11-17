@@ -1,48 +1,3 @@
-;
-; Title:	Life - Main
-; Author:	Craig Patterson
-; Created:	06/30/2023
-
-; Conway's Game of Life for Agon Light
-; -------------------------------------
-;
-; Agon Light version written by Craig Patterson
-; craiglp@gmail.com -- Jun 2023
-;
-; Amstrad CPC version written by Brian Chiha
-; brian.chiha@gmail.com  -- Mar 2021
-;
-; Game of Life is a cellular automation simulation.  Each cell evolves based on the number
-; of cells that surround it.  The basic cell rules are:
-;
-;    * Any live cell with two or three live neighbours survives.
-;    * Any dead cell with three live neighbours becomes a live cell.
-;    * All other live cells die in the next generation. Similarly, all other dead cells stay dead.
-;
-;To work out top/bottom cells, Place a zero row one above and below the ROW*COL cell table. To
-;handle left/right cells, place one zero column on the left. And for the bottom right cell
-;add one extra byte.
-;
-;If cell is alive it will be set to 1, if it is dead, it will be zero.
-
-; Memory map with upper/lower/left/right buffer.  Total of 1108 bytes for 40x25 matrix
-; X = potential cell position, 0 = always zero
-;
-;    0 0 0 0 0 0 0 0 0 0
-;    0 1 2 3 4 5 6 7 8 9
-;
-;00  0 0 0 0 0 0 0 0 0 0
-;01  0 X X X X X X X X X
-;02  0 X X X X X X X X X
-;03  0 X X X X X X X X X
-;04  0 X X X X X X X X X
-;05  0 X X X X X X X X X
-;06  0 X X X X X X X X X
-;07  0 X X X X X X X X X
-;08  0 X X X X X X X X X
-;09  0 X X X X X X X X X
-;0A  0  <= needed for last bottom right check
-
 
 			.ASSUME	ADL = 1
 
@@ -565,28 +520,5 @@ _RULE_TABLE:
 
 b_BORN			DB	0h
 b_SURVIVE		DB	0h
-
-;r_CONWAY:			DB	06h,04h	;23/3
-;r_2X2:				DB	13h,24h	;"125/36", 0
-;r_34LIFE:			DB	0Ch,0Ch	;"34/34", 0
-;r_AMOEBA:			DB	95h,54h	;"1358/357", 0
-;r_ASSIMILATION:	DB	78h,1Ch	;"4567/345", 0
-;r_COAGULATIONS:	DB	F6h,C4h	;"235678/378", 0
-;r_CORAL:			DB	F8h,04h	;"45678/3", 0
-;r_DAYANDNIGHT:		DB	ECh,E4h	;"34678/3678", 0
-;r_DIAMOEBA:		DB	F0h,F4h	;"5678/35678", 0
-;r_FLAKES:			DB	FFh,04h	;"012345678/3", 0
-;r_GNARL:			DB	01h,01h	;"1/1", 0
-;r_HIGHLIFE:		DB	06h,24h	;"23/36", 0
-;r_LONGLIFE:		DB	10h,1Ch	;"5/345", 0
-;r_MAZE:			DB	1Fh,04h	;"12345/3", 0
-;r_MAZECTRIC:		DB	0Fh,04h	;"1234/3", 0
-;r_MOVE:			DB	1Ah,A4h	;"245/368", 0
-;r_PSEUDOLIFE:		DB	86h,54h	;"238/357", 0
-;r_REPLICATOR:		DB	55h,55h	;"1357/1357", 0
-;r_SEEDS:			DB	00h,02h	;"/2", 0
-;r_SERVIETTES:		DB	00h,0Eh	;"/234", 0
-;r_STAINS:			DB	F6h,E4h	;"235678/3678", 0
-;r_WALLEDCITIES:	DB	1Eh,F8h	;"2345/45678", 0
 
 _MATRIX_START:

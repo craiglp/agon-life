@@ -20,29 +20,48 @@ https://worldofspectrum.org/forums/discussion/39632/cmwc-random-number-generator
  Game of Life is a cellular automation simulation.  Each cell evolves based on the number
  of cells that surround it, it's neighborhood.  
  
- The Conway Game of Life cell rules are:
+ The well known Conway's Game of Life cell rules are:
 
     * Any live cell with two or three live neighbours survives.
     * Any dead cell with three live neighbours becomes a live cell.
     * All other live cells die in the next generation. Similarly, all other dead cells stay dead.
 
-These rules can be written in a form, S/B. Where S is the counts of surrounding neighbors necessary 
-for a cell to survive, and B is the counts of alive neighbors necessary for a cell to be born. Using
-this notation Conway's Life rule is 23/3
+These rules can be written in a form, S/B. Where S is the count of surrounding neighbors necessary for a cell to survive, and B is the count of alive neighbors necessary for a cell to be born. Using this notation Conway's Life rule is 23/3. Each digit on each side of slash are evaluated seperately. So, 23 means 2 or 3, not twenty three. Values are a combination of digits 0-8, with a max of 9 digits.
 
-There are a number of other rulesets that define other members of the "Life" family of cellular
-automata. 
+There are a number of other rulesets that define other members of the "Life" family of cellular automata. See http://www.mirekw.com/ca/rullex_life.html for examples.
 
-Calcuation for next cells are done from memory starting at _MATRIX_START.  Current Base is 
-what is displayed
-on the screen, Next Base is used to place the next life cycle.  Once all cells are check
-Next Base will be copied to Current Base
+Calcuation for next cells are done from memory starting at _MATRIX_START.  Current Base (CURRBASE) is what is displayed on the screen, Next Base (NEXTBASE) is used to set the next life cycle. Once all cells are checked Next Base will be copied to Current Base and displayed.
 
-To Work out top/bottom cells, I place a zero row one above and below the 1000 cell table.  To
-handle left/right cells, I place one zero column on the left.  And for the bottom right cell
-I have one extra byte.
+To work out top/bottom cells, a zero row is placed above and below the 1000 cell table. To handle left/right cells, one zero column is placed on the left.  And for the bottom right cell this is one extra byte.
 
-If Cell is alive it will be set to 1, if it is dead, it will be zero.
+The matrix starts out with a random set of living cells. Each new generation is evaluated until you press the Escape key to exit.
+
+A ruleset is selected by typing the LOWER case letter of the ruleset on the start up menu. Selecting 0 (zero) will exit the program without selecting a ruleset.
+
+Life Family Cellular Automata
+	A. Conway's Life - Chaotic - 23/3
+	B. 2x2 - Chaotic - 125/36
+	C. 34 Life - Exploding - 34/34
+	D. Amoeba - Chaotic - 1358/357
+	E. Assimilation - Stable - 4567/345
+	F. Coagulations - Exploding - 235678/378
+	G. Coral - Exploding - 45678/3
+	H. Day & Night - Stable - 34678/3678
+	I. Diamoeba - Chaotic - 5678/35678
+	J. Flakes - Expanding - 012345678/3
+	K. Gnarl - Exploding - 1/1
+	L. HighLife - Chaotic - 23/36
+	M. Long Life - Stable - 5/345
+	N. Maze - Exploding - 12345/3
+	O. Mazectric - Exploding - 1234/3
+	P. Move - Stable - 245/368
+	Q. Pseudo Life - Chaotic - 238/357
+	R. Replicator - Exploding - 1357/1357
+	S. Seeds - Exploding - 0/2
+	T. Serviettes - Exploding - 0/234
+	U. Stains - Stable - 235678/3678
+	V. WalledCities - Stable - 2345/45678
+
 ```
  Memory Map With Upper/Lower/Left/Right buffer.
  X = potential cell position, 0 = always zero
@@ -67,9 +86,7 @@ Requires: <br>
 MOS 1.03 <br>
 VDP 1.03
 
-(Tested successfully with MOS 1.04RC2, and VDP 1.04RC2)
-
-Each generation is evaluated until you press Escape to exit.
+(Tested successfully with MOS 1.04, and VDP 1.04, as well as Console8 2.1.0  MOS and VDP)
 
 # <<< Road Map >>>
 
@@ -79,9 +96,10 @@ Each generation is evaluated until you press Escape to exit.
 * ~~Generation counter~~
 * ~~Full run, with keyboard scan. Run until stopped, rather than one generation per keystroke~~
 * ~~Need a more 'random' random number generator~~
-* User config of matrix start state
 * Allow user to select Cellular Automata Ruleset to run other variations of Life
-* http://www.mirekw.com/ca/rullex_life.html
+* User defined ruleset
+* Graphical plotting
+* User selected screen mode
 
 
 
