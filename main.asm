@@ -7,10 +7,10 @@
 
 			XDEF	_main
 			
-			SCRMODE			EQU		17						;Screen Mode 17
+			SCRMODE			EQU		2;17						;Screen Mode 17
 
-			ROWS			EQU		69						;Rows on screen -2 rows for status line
-			COLS			EQU		98						;Columns on screen
+			ROWS			EQU		57;69						;Rows on screen -2 rows for status line
+			COLS			EQU		78;98						;Columns on screen
 
 			TOT_CELLS		EQU		(ROWS+2)*(COLS+1)+1		;Total number of cells
 
@@ -37,33 +37,33 @@
 
 _main:		
 			;Set screen mode, disable text cursor, clear text screen
-			LD		HL, init_screen
-			LD		BC, init_screen_end - init_screen
-			RST.LIL	18h
+			ld		HL, init_screen
+			ld		BC, init_screen_end - init_screen
+			rst.lil	18h
 			
+			;Define Alive cell custom character
+			ld		HL, s_CELL_CHAR
+			call	print_string
+
 			;Display menu of life configurations
 			call	print_menu
 			call	get_rule_choice
-			cp		ZERO
-			jp		z, stop
-			
-			;Clear the screen and init screen mode
-			LD		HL, init_screen
-			LD		BC, init_screen_end - init_screen
-			RST.LIL	18h
+			cp		ZERO			;Quit program if 0 menu item selected
+			jr		Z, stop
 
-			;Define Alive cell custom character
-			LD		HL, s_CELL_CHAR
-			CALL	print_string
+			;Clear the screen and init screen mode
+			ld		HL, init_screen
+			ld		BC, init_screen_end - init_screen
+			rst.lil	18h
 
 start:
-			CALL	clear_cells
-			CALL	load_random		;Initialize cell data with random values
+			call	clear_cells
+			call	load_random		;Initialize cell data with random values
 life:
-			CALL	print_statusline
-			CALL	print_cells
-			CALL	process_rules	;Do Life Rules on current cells
-
+			call	print_statusline
+			call	print_cells
+			call	process_rules	;Do Life Rules on current cells
+			
 			MOSCALL	mos_sysvars		;get the sysvars location - consider saving IX for speed
 			ld.lil	a,(IX+sysvar_vkeycount)	;check if any key has been pressed
 			ld	hl,keycount
@@ -74,173 +74,173 @@ life:
 			cp	ESC							;is it Escape
 			jr	nz, life
 						
-stop:		LD		HL, s_LIFE_END	;Escape pressed, clean up and exit
-			LD		BC, 0
-			LD		A, 0
-			RST.LIS	18h
+stop:		ld		HL, s_LIFE_END	;Escape pressed, clean up and exit
+			ld		BC, 0
+			ld		A, 0
+			rst.lis	18h
 										
 			;Enable text cursor
-			LD		A, 23			;VDU 23
-			RST.LIL	10h
-			LD		A, 1
-			RST.LIL	10h			
-			LD		A, 1
-			RST.LIL	10h			
+			ld		A, 23			;VDU 23
+			rst.lil	10h
+			ld		A, 1
+			rst.lil	10h			
+			ld		A, 1
+			rst.lil	10h			
 
-			LD		HL, 0			;Return, Error code = 0
-			RET
+			ld		HL, 0			;Return, Error code = 0
+			ret
 	
 clear_cells:
-			LD		HL, 0
-			LD		(GENERATION), HL
+			ld		HL, 0
+			ld		(GENERATION), HL
 			
-			LD		HL,CURRBASE     ;Clear current cell data location to be all zeros
-			LD		DE,CURRBASE+1 
-			XOR		A               ;Set to 0 (Zero)
-			LD		(HL),A 
-			LD		BC,TOT_CELLS    ;Cells to be cleared
-			LDIR					;Do the copy
+			ld		HL,CURRBASE     ;Clear current cell data location to be all zeros
+			ld		DE,CURRBASE+1 
+			xor		A               ;Set to 0 (Zero)
+			ld		(HL),A 
+			ld		BC,TOT_CELLS    ;Cells to be cleared
+			ldir					;Do the copy
 			
-			LD		HL,NEXTBASE		;Clear next cell data location to be all zeros
-			LD		DE,NEXTBASE+1
-			XOR		A				;Set to 0 (Zero)
-			LD		(HL),A 
-			LD		BC,TOT_CELLS
-			LDIR					;Do the copy
-			RET
+			ld		HL,NEXTBASE		;Clear next cell data location to be all zeros
+			ld		DE,NEXTBASE+1
+			xor		A				;Set to 0 (Zero)
+			ld		(HL),A 
+			ld		BC,TOT_CELLS
+			ldir					;Do the copy
+			ret
 			
 ;Load random cells in memory. This interates through all cells and calls
 ;an psuedo random routine. If that routine sets the carry flag then set the 
 ;cell to Alive. TODO: This needs work, not random enough
 load_random:
-			LD		HL,CURRSTART 
-			LD		B,ROWS 
+			ld		HL,CURRSTART 
+			ld		B,ROWS 
 	COL:								;Columns
-			PUSH	BC 
-			LD		B,COLS 
+			push	BC 
+			ld		B,COLS 
 	ROW:								;Rows
-			PUSH	HL
-			CALL	rnd				    ;Call random routine
-			POP		HL
-			LD		A,01h				;Default to Alive
-			JR		C,STORECELL 
-			XOR		A					;Set to Dead
+			push	HL
+			call	rnd				    ;Call random routine
+			pop		HL
+			ld		A,01h				;Default to Alive
+			jr		C,STORECELL 
+			xor		A					;Set to Dead
 	STORECELL:
-			LD		(HL),A				;Store the cell
-			INC		HL 
-			DJNZ	ROW 
-			INC		HL					;Skip left hand zero column
-			POP		BC 
-			DJNZ	COL 
-			RET							;Exit
+			ld		(HL),A				;Store the cell
+			inc		HL 
+			djnz	ROW 
+			inc		HL					;Skip left hand zero column
+			pop		BC 
+			djnz	COL 
+			ret							;Exit
 
 ;Loop through the current array and print cells
 print_cells:
-			PUSH	DE					;Save DE registers to use for plotting cells
+			push	DE					;Save DE registers to use for plotting cells
 			
-			LD		IX,CURRSTART
-			LD		B,ROWS
+			ld		IX,CURRSTART
+			ld		B,ROWS
 	NEWROW0:
-			LD		D,B
-			PUSH	BC					;Save Registers, save current row value
-			LD		B,COLS				;Get the # of columns
+			ld		D,B
+			push	BC					;Save Registers, save current row value
+			ld		B,COLS				;Get the # of columns
 	NEWCOL0:
-			LD		E,B
-			LD		A,(IX)
+			ld		E,B
+			ld		A,(IX)
 			
-			CALL	plot_cell
-			CALL	print_cell
+			call	plot_cell
+			call	print_cell
 			
-			INC		IX					;Move to next Column
-			DJNZ	NEWCOL0				;Repeat until all columns are printed
-			INC		IX					;Skip left zero buffer
-			POP		BC					;Pop the current row value
+			inc		IX					;Move to next Column
+			djnz	NEWCOL0				;Repeat until all columns are printed
+			inc		IX					;Skip left zero buffer
+			pop		BC					;Pop the current row value
 			
-			DJNZ	NEWROW0				;Repeat until all rows are printed
+			djnz	NEWROW0				;Repeat until all rows are printed
 			
-			POP		DE					;Restore DE registers
-			RET							;Exit			
+			pop		DE					;Restore DE registers
+			ret							;Exit			
 			
 ;Move to the cell at E,D (x,y)
 plot_cell:
-			PUSH	AF
+			push	AF
 
-			LD		A, 31				;Move cursor to x,y
-			RST.LIL	10h
-			LD		A, E 				;Column
-			RST.LIL	10h
-			LD		A, D				;Row
-			RST.LIL	10h
+			ld		A, 31				;Move cursor to x,y
+			rst.lil	10h
+			ld		A, E 				;Column
+			rst.lil	10h
+			ld		A, D				;Row
+			rst.lil	10h
 
-			POP		AF
-			RET							;Exit
+			pop		AF
+			ret							;Exit
 
 ;Print a cell, if alive, blank if dead
 print_cell:
-			LD		C,A
-			CP 		01h					;Is cell value == 1?
-			LD 		A, 20h		
-			JR 		NZ,$F
-			LD 		A, 130
-	$$:		RST.LIS 10h
-			LD 		A,C
-			RET							;Exit
+			ld		C,A
+			cp 		01h					;Is cell value == 1?
+			ld 		A, 20h		
+			jr 		NZ,$F
+			ld 		A, 130
+	$$:		rst.lis 10h
+			ld 		A,C
+			ret							;Exit
 
 
 ;Print generation count at bottom of screen
 print_statusline:
-			LD		A, 31				;Move cursor to status line
-			RST.LIL	10h
-			LD		A, 0
-			RST.LIL	10h
-			LD		A, ROWS+2
-			RST.LIL	10h
+			ld		A, 31				;Move cursor to status line
+			rst.lil	10h
+			ld		A, 0
+			rst.lil	10h
+			ld		A, ROWS+2
+			rst.lil	10h
 
-			LD		HL, s_STATUS		;Print generation count text
-			CALL	print_string
-			LD		HL, (GENERATION)	
-			INC		HL					;Increment generation count
-			LD		(GENERATION), HL
-			CALL	print_decimal		;Print generation count
+			ld		HL, s_STATUS		;Print generation count text
+			call	print_string
+			ld		HL, (GENERATION)	
+			inc		HL					;Increment generation count
+			ld		(GENERATION), HL
+			call	print_decimal		;Print generation count
 			
-			RET							;Exit
+			ret							;Exit
 
 print_string:
-			LD		BC, 0
-			LD		A, 0
-			RST.LIS	18h
-			RET							;Exit
+			ld		BC, 0
+			ld		A, 0
+			rst.lis	18h
+			ret							;Exit
 
 ; Print a decimal number (less than 1000000)
 ; Input: HL 24-bit number to print.
 print_decimal:	
-			PUSH	IY
-			PUSH	DE
-			PUSH 	BC
-			LD		IY, Num_Table
-			LD		B, 6		; Consider 6 digits
-			LD		C, 6		; Leading zero counter, reaches 1 if sixth digit sill 0.		; 
+			push	IY
+			push	DE
+			push 	BC
+			ld		IY, Num_Table
+			ld		B, 6		; Consider 6 digits
+			ld		C, 6		; Leading zero counter, reaches 1 if sixth digit sill 0.		; 
 	Print_Dec1:
-			LD		DE, (IY+0) 	; Take next power of 10.
+			ld		DE, (IY+0) 	; Take next power of 10.
 			LEA		IY, IY+4
-			LD		A, '0'-1
-	$$:		INC		A
-			AND 	A	
+			ld		A, '0'-1
+	$$:		inc		A
+			and 	A	
 			SBC 	HL, DE		; Repeatedly subtract power of 10 until carry
-			JR		NC, $B
-			ADD		HL, DE		; Undo the last subtract that caused carry					
-			CP		'0'
-			JR		NZ, $F		; Don't print leading zero			
+			jr		NC, $B
+			add		HL, DE		; Undo the last subtract that caused carry					
+			cp		'0'
+			jr		NZ, $F		; Don't print leading zero			
 			DEC		C	
-			JR		NZ, Print_Dec2	; But do print 0 if it's the units digit.
-	$$:		RST.LIL	10h
-			LD		C, 1		; Make sure the next digit will be printed.
+			jr		NZ, Print_Dec2	; But do print 0 if it's the units digit.
+	$$:		rst.lil	10h
+			ld		C, 1		; Make sure the next digit will be printed.
 	Print_Dec2:
-			DJNZ	Print_Dec1
-			POP 	BC
-			POP		DE
-			POP		IY
-			RET							;Exit
+			djnz	Print_Dec1
+			pop 	BC
+			pop		DE
+			pop		IY
+			ret							;Exit
 
 Num_Table	DL	100000
 			DL	10000
@@ -255,7 +255,7 @@ Curr_Col	DB	0
 
 ; Sets or clears carry flag to do a "coin flip"
 rnd:    
-			PUSH 	BC
+			push 	BC
 
 			ld   bc,0       ; i
 			ld   a,c
@@ -280,14 +280,14 @@ rnd:
 			cpl             ; x = (b-1) - x = -x - 1 = ~x + 1 - 1 = ~x
 			ld   (de),a
 
-			AND	#B8h		; mask non feedback bit
+			and	#B8h		; mask non feedback bit
 			SCF				; set carry
 			JP	PO, $F		; skip clear if odd
 			CCF				; complement carry (clear it)
 	$$:
 			RLA
 
-			POP 	BC
+			pop 	BC
 		    ret
 
 print_menu:
@@ -301,149 +301,143 @@ get_rule_choice:
 			MOSCALL	mos_getkey
 			OR	A 		
 			JP	Z, get_rule_choice		; Loop until key is pressed
-			CP	ZERO
+			cp	ZERO
 			JP	Z, DONE					; Zero pressed, exit program
 
-			CP	LETTERA					; No valid choice selected, get another key
+			cp	LETTERA					; No valid choice selected, get another key
 			JP	M, get_rule_choice		; Keycode less than 'a'
-			CP	LETTERV
+			cp	LETTERV
 			JP	P, get_rule_choice		; Keycode greater than 'v'
 			
 										; Valid choice - pass ruleset back to caller
 			SUB LETTERA					; Using lowercase letters, subtract value of 'a' to get index value
-			LD	L, A					; Set the index value into HL
-			LD	H, 0h
+			ld	L, A					; Set the index value into HL
+			ld	H, 0h
 			
-			ADD HL, HL					; Align to the first byte
+			add HL, HL					; Align to the first byte
 			
-			LD	DE, _RULE_TABLE			; Load DE with the starting address of the jump table
-			ADD	HL, DE 					; Add index value to the jump table start address
+			ld	DE, _RULE_TABLE			; Load DE with the starting address of the jump table
+			add	HL, DE 					; Add index value to the jump table start address
 
+			ld A, (HL) 					; Load the byte pointed to by HL into A
+			ld (b_SURVIVE), A 			; Store the upper byte in b_SURVIVE
+			inc HL 						; Increment HL to point to the next byte
+			ld A, (HL) 					; Load the next byte pointed to by HL into A
+			ld (b_BORN), A 				; Store the lower byte in b_BORN
 
-			LD  BC, (HL)				; Get the value pointed to by HL, load into BC
-			LD	A, C
-			LD (b_SURVIVE), A			; Load b_SURVIVE with the value pointed to by the rule table			
-			LD	A, B
-			LD (b_BORN), A
-				
-	DONE:	RET
+	DONE:	ret
 		
 ;Update the matrix with Life Rules.  
 ;Nested For-loop with Rows and Columns.
 ;
 process_rules:
-			LD		IX,CURRSTART
-			LD		HL,NEXTSTART
-			LD		B,ROWS
+			ld		IX,CURRSTART
+			ld		HL,NEXTSTART
+			ld		B,ROWS
 	NEWROW:
-			PUSH	BC						;Save Registers
-			LD		B,COLS
+			push	BC						;Save Registers
+			ld		B,COLS
 	NEWCOL:
 			;Check the current cell and count number of live cells in the neighborhood.
 			;Use IX to make checking easier, save count in A
-			LD		A,(IX-UPPER_LEFT)
-			ADD		A,(IX-UPPER_MID)
-			ADD		A,(IX-UPPER_RIGHT)
-			ADD		A,(IX-MID_LEFT)
-			ADD		A,(IX+MID_RIGHT)
-			ADD		A,(IX+BOTTOM_LEFT)
-			ADD		A,(IX+BOTTOM_MID)
-			ADD		A,(IX+BOTTOM_RIGHT)
-
-			;A will contain the count of live cells in the
-			;neighborhood. Return cell in D. 
+			ld		A,(IX-UPPER_LEFT)
+			add		A,(IX-UPPER_MID)
+			add		A,(IX-UPPER_RIGHT)
+			add		A,(IX-MID_LEFT)
+			add		A,(IX+MID_RIGHT)
+			add		A,(IX+BOTTOM_LEFT)
+			add		A,(IX+BOTTOM_MID)
+			add		A,(IX+BOTTOM_RIGHT)
 			
-			LD E, A
-
+			;A will contain the count of live cells in the
+			;neighborhood. 
+			
 		EVALUATE:
 			;Evaluate surrounding cell count to create or destroy current cell
 			;This is the rules being applied for the cell
+			ld E, A						;Save neighborhood count
 			
-			LD B, E
-			LD A, (b_SURVIVE)
-			CALL	checkBit
-			LD A, C
+			ld	D, 01h					;Alive
+			;Check for survivors
+			ld A, (b_SURVIVE)			;Load ruleset into A
+			
+			call checkBit
 			;A contains 1 if cell survives, 0 if not
-			
-			LD		D,01h					;Alive
-			CP		01h						;Compare A to 01h.
-			JR		Z,STORE_CELL			;Save Alive cell
+			cp	01h						;Compare A to 01h.
+			jr	Z, STORE_CELL			;Save Alive cell
 
-			LD B, E
-			LD A, (b_BORN)
-			CALL	checkBit
-			LD A, C
+			ld	D, 00h					;Assume dead until found otherwise
+			;Check for births
+;			ld B, E
+			ld A, (b_BORN)
+			call checkBit
 			;A contains 1 if cell is born, 0 if not
+			cp	01h						;Compare A to 01h.
+			jr	NZ,STORE_CELL			;Save Dead cell
 			
-			LD		D,00h					;Assume dead until found otherwise
-			CP		01h						;Compare A to 01h.
-			JR		NZ,STORE_CELL			;Save Dead cell
-			LD		A,(IX+0)				
-			AND		01h						;Keep it alive if already alive.
-			LD		D,A						;Load current cell in A
-
+			ld	A,(IX+0)				;Keep it alive if already alive.
+			and	01h						
+			ld	D, A
 
 		STORE_CELL:
 			;Save the new cell to the Next Cell Cycle table
-			LD		A,D						;D stores cell evaluation
-			LD		(HL),A					;Update cell on Next Matrix
-			INC		HL						;Move to next Column
-			INC		IX						;Move to next Column
-			DJNZ	NEWCOL					;Repeat until all columns are checked
+			ld		A, D
+			ld		(HL),A					;Update cell on Next Matrix
+			inc		HL						;Move to next Column
+			inc		IX						;Move to next Column
+			djnz	NEWCOL					;Repeat until all columns are checked
 
-			INC		HL						;Skip left zero buffer
-			INC		IX						;Skip left zero buffer
-			POP		BC 
-			DJNZ	NEWROW					;Repeat until all rows are checked
+			inc		HL						;Skip left zero buffer
+			inc		IX						;Skip left zero buffer
+			pop		BC 
+			djnz	NEWROW					;Repeat until all rows are checked
 
 			;Copy next matrix to current
-			LD		HL,NEXTSTART
-			LD		DE,CURRSTART
-			LD		BC,TOT_CELLS			;All cells (include left zero buffer)
-			LDIR							;Do the Copy
+			ld		HL,NEXTSTART
+			ld		DE,CURRSTART
+			ld		BC,TOT_CELLS			;All cells (include left zero buffer)
+			ldir							;Do the Copy
 
-			RET								;Exit
+			ret								;Exit
 			
-
-; Subroutine to check if a bit position in a byte is set
+			
+; check_bit subroutine
+;
 ; Input:
-;   A - rule byte
-;   B - cell neighborhood count (bit position to check)
+;   A - Rule set, with data represented by the position of each set bit
+;   E - Neighborhood count, containing a value of 0 to 8
+;
 ; Output:
-;   C - 1 if bit position is set, 0 otherwise
+;   A - 1 if the neighborhood count value corresponds to a bit position in the ruleset byte that is set, 0 otherwise
+;
 checkBit:
- ; Save registers
-    push af
-    push bc
+	push de
+; Loop to shift the accumulator right by the value of register B
+	ld d,e
+	dec b
+loop:
+    srl a
+    dec e
+    jr nz, loop
 
-    jp c, check_bit_position_not_set
+; Check if the least significant bit is set
+	and 01h
 
-    ; Mask out all but the specified bit
-    rlca ; Rotate left with carry through, effectively shifting B to the leftmost position
-    rrca ; Rotate right with carry through, effectively shifting B back to its original position
-    and a, b
+; If it is set, return 1
+	jr nz, check_bit_return
 
-    ; Check if the bit is set
-    jr nz, check_bit_position_set
+; Otherwise, return 0
+	ld a, 00h
+	pop de
+	ret
 
-check_bit_position_not_set:
-    ld c, 0
+check_bit_return:
+	ld a, 01h
+	pop de
+	ret
 
-    ; Restore registers and return
-    pop bc
-    pop af
-    ret
-	
-check_bit_position_set:
-    ; Bit is set
-    ld c, 1
 
-    ; Restore registers and return
-    pop bc
-    pop af
-    ret
-	
-	
+; Random number generator seed table
 table:
     db   82,97,120,111,102,116,20,12
 
@@ -487,10 +481,8 @@ s_MENU:
 	DB	"\tP. Move - Stable\n\r"
 	DB	"\tQ. Pseudo Life - Chaotic\n\r"
 	DB	"\tR. Replicator - Exploding\n\r"
-	DB	"\tS. Seeds - Exploding\n\r"
-	DB	"\tT. Serviettes - Exploding\n\r"
-	DB	"\tU. Stains - Stable\n\r"
-	DB	"\tV. WalledCities - Stable\n\r\n\r"
+	DB	"\tS. Stains - Stable\n\r"
+	DB	"\tT. WalledCities - Stable\n\r\n\r"
 	DB	"\t0. Exit the program\n\r\n\r"
 	DB	"\tPick a ruleset [A]: ", 0
 
@@ -513,12 +505,10 @@ _RULE_TABLE:
 	DW	1AA4h	;00011010 10100100
 	DW	8654h	;10000110 01010100
 	DW	5555h	;01010101 01010101
-	DW	0002h	;00000000 00000010
-	DW	000Eh	;00000000 00001110
 	DW	F6E4h	;11110110 11100100
 	DW	1EF8h	;00011110 11111000
 
-b_BORN			DB	0h
-b_SURVIVE		DB	0h
+b_BORN			DB	01h
+b_SURVIVE		DB	01h
 
 _MATRIX_START:
