@@ -42,10 +42,10 @@ _main:
 			RST.LIL	18h
 			
 			;Display menu of life configurations
-			call	print_menu
-			call	get_rule_choice
-			cp		ZERO
-			jp		z, stop
+			;call	print_menu
+			;call	get_rule_choice
+			;cp		ZERO
+			;jp		z, stop
 			
 			;Clear the screen and init screen mode
 			LD		HL, init_screen
@@ -62,7 +62,7 @@ start:
 life:
 			CALL	print_statusline
 			CALL	print_cells
-			CALL	process_rules	;Do Life Rules on current cells
+			CALL	conway	;Do Life Rules on current cells
 
 			MOSCALL	mos_sysvars		;get the sysvars location - consider saving IX for speed
 			ld.lil	a,(IX+sysvar_vkeycount)	;check if any key has been pressed
@@ -443,6 +443,67 @@ check_bit_position_set:
     pop af
     ret
 	
+	
+;Update the matrix with Conway Rules.  
+;Nested For-loop with Rows and Columns.
+;The basic cell rules are:
+;    * Any live cell with two or three live neighbours survives.
+;    * Any dead cell with three live neighbours becomes a live cell.
+;    * All other live cells die in the next generation. Similarly, all other dead cells stay dead.
+;
+conway:
+			LD		IX,CURRSTART
+			LD		HL,NEXTSTART
+			LD		B,ROWS
+	NEWROWA:
+			PUSH	BC						;Save Registers
+			LD		B,COLS
+	NEWCOLA:
+			;Check the current cell and update count on number of live cells.  Use IX to
+			;make checking easier
+			LD		A,(IX-UPPER_LEFT)
+			ADD		A,(IX-UPPER_MID)
+			ADD		A,(IX-UPPER_RIGHT)
+			ADD		A,(IX-MID_LEFT)
+			ADD		A,(IX+MID_RIGHT)
+			ADD		A,(IX+BOTTOM_LEFT)
+			ADD		A,(IX+BOTTOM_MID)
+			ADD		A,(IX+BOTTOM_RIGHT)
+
+		EVALUATE00:
+			;Evaluate surrounding cell count to create or destroy current cell
+			;This is the rules being applied for the cell
+			LD		D,01h					;Alive
+			CP		03h						;Check if 3 cells around
+			JR		Z,STOREC				;Save Alive cell	
+			LD		D,00h					;Dead
+			CP		02h						;Check if 2 cells around
+			JR		NZ,STOREC				;Save Dead cell if not 2
+			LD		A,(IX+0)				;Current Cell had only 2 cells around
+			AND		01h						;Keep it alive if already alive.
+			LD		D,A						;Load current cell in A
+
+		STOREC:
+			;Save the new cell to the Next Cell Cycle table
+			LD		A,D						;D stores cell evaluation
+			LD		(HL),A					;Update cell on Next Matrix
+			INC		HL						;Move to next Column
+			INC		IX						;Move to next Column
+			DJNZ	NEWCOLA					;Repeat until all columns are checked
+
+			INC		HL						;Skip left zero buffer
+			INC		IX						;Skip left zero buffer
+			POP		BC 
+			DJNZ	NEWROWA					;Repeat until all rows are checked
+
+			;Copy next matrix to current
+			LD		HL,NEXTSTART
+			LD		DE,CURRSTART
+			LD		BC,TOT_CELLS			;All cells (include left zero buffer)
+			LDIR							;Do the Copy
+
+			RET								;Exit
+		
 	
 table:
     db   82,97,120,111,102,116,20,12
