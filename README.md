@@ -57,8 +57,10 @@ Life Family Cellular Automata
 	P. Move - Stable - 245/368
 	Q. Pseudo Life - Chaotic - 238/357
 	R. Replicator - Exploding - 1357/1357
-	S. Stains - Stable - 235678/3678
-	T. WalledCities - Stable - 2345/45678
+	S. Seeds - Exploding - 0/2
+	T. Serviettes - Exploding - 0/234
+	U. Stains - Stable - 235678/3678
+	V. WalledCities - Stable - 2345/45678
 
 ```
  Memory Map With Upper/Lower/Left/Right buffer.
