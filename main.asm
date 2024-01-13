@@ -42,10 +42,10 @@ _main:
 			RST.LIL	18h
 			
 			;Display menu of life configurations
-			;call	print_menu
-			;call	get_rule_choice
-			;cp		ZERO
-			;jp		z, stop
+			call	print_menu
+			call	get_rule_choice
+			cp		ZERO
+			jp		z, stop
 			
 			;Clear the screen and init screen mode
 			LD		HL, init_screen
@@ -62,7 +62,7 @@ start:
 life:
 			CALL	print_statusline
 			CALL	print_cells
-			CALL	conway	;Do Life Rules on current cells
+			CALL	process_rules	;conway	;Do Life Rules on current cells
 
 			MOSCALL	mos_sysvars		;get the sysvars location - consider saving IX for speed
 			ld.lil	a,(IX+sysvar_vkeycount)	;check if any key has been pressed
@@ -351,37 +351,36 @@ process_rules:
 			ADD		A,(IX+BOTTOM_RIGHT)
 
 			;A will contain the count of live cells in the
-			;neighborhood. Return cell in D. 
+			;neighborhood.
 			
 			LD E, A
 
 		EVALUATE:
 			;Evaluate surrounding cell count to create or destroy current cell
 			;This is the rules being applied for the cell
+			ld E, A						;Save neighborhood count
 			
-			LD B, E
-			LD A, (b_SURVIVE)
-			CALL	checkBit
-			LD A, C
+			ld	D, 01h					;Alive
+			;Check for survivors
+			ld A, (b_SURVIVE)			;Load ruleset into A
+			
+			call checkBit
 			;A contains 1 if cell survives, 0 if not
-			
-			LD		D,01h					;Alive
-			CP		01h						;Compare A to 01h.
-			JR		Z,STORE_CELL			;Save Alive cell
+			cp	01h						;Compare A to 01h.
+			jr	Z, STORE_CELL			;Save Alive cell
 
-			LD B, E
-			LD A, (b_BORN)
-			CALL	checkBit
-			LD A, C
+			ld	D, 00h					;Assume dead until found otherwise
+			;Check for births
+;			ld B, E
+			ld A, (b_BORN)
+			call checkBit
 			;A contains 1 if cell is born, 0 if not
+			cp	01h						;Compare A to 01h.
+			jr	NZ,STORE_CELL			;Save Dead cell
 			
-			LD		D,00h					;Assume dead until found otherwise
-			CP		01h						;Compare A to 01h.
-			JR		NZ,STORE_CELL			;Save Dead cell
-			LD		A,(IX+0)				
-			AND		01h						;Keep it alive if already alive.
-			LD		D,A						;Load current cell in A
-
+			ld	A,(IX+0)				;Keep it alive if already alive.
+			and	01h						
+			ld	D, A
 
 		STORE_CELL:
 			;Save the new cell to the Next Cell Cycle table
@@ -405,43 +404,40 @@ process_rules:
 			RET								;Exit
 			
 
-; Subroutine to check if a bit position in a byte is set
+; check_bit subroutine
+;
 ; Input:
-;   A - rule byte
-;   B - cell neighborhood count (bit position to check)
+;   A - Rule set, with data represented by the position of each set bit
+;   E - Neighborhood count, containing a value of 0 to 8
+;
 ; Output:
-;   C - 1 if bit position is set, 0 otherwise
+;   A - 1 if the neighborhood count value corresponds to a bit position in the ruleset byte that is set, 0 otherwise
+;
 checkBit:
- ; Save registers
-    push af
-    push bc
+	push de
+; Loop to shift the accumulator right by the value of register B
+	ld d,e
+	dec e
+loop:
+    srl a
+    dec e
+    jr nz, loop
 
-    jp c, check_bit_position_not_set
+; Check if the least significant bit is set
+	and 01h
 
-    ; Mask out all but the specified bit
-    rlca ; Rotate left with carry through, effectively shifting B to the leftmost position
-    rrca ; Rotate right with carry through, effectively shifting B back to its original position
-    and a, b
+; If it is set, return 1
+	jr nz, check_bit_return
 
-    ; Check if the bit is set
-    jr nz, check_bit_position_set
+; Otherwise, return 0
+	ld a, 00h
+	pop de
+	ret
 
-check_bit_position_not_set:
-    ld c, 0
-
-    ; Restore registers and return
-    pop bc
-    pop af
-    ret
-	
-check_bit_position_set:
-    ; Bit is set
-    ld c, 1
-
-    ; Restore registers and return
-    pop bc
-    pop af
-    ret
+check_bit_return:
+	ld a, 01h
+	pop de
+	ret
 	
 	
 ;Update the matrix with Conway Rules.  
