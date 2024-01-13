@@ -38,28 +38,28 @@ The matrix starts out with a random set of living cells. Each new generation is 
 
 A ruleset is selected by typing the LOWER case letter of the ruleset on the start up menu. Selecting 0 (zero) will exit the program without selecting a ruleset.
 
-Life Family Cellular Automata
+##### Life Family Cellular Automata<br>
+A. Conway's Life - Chaotic - 23/3<br>
+B. 2x2 - Chaotic - 125/36<br>	
+C. 34 Life - Exploding - 34/34<br>	
+D. Amoeba - Chaotic - 1358/357<br>	
+E. Assimilation - Stable - 4567/345<br>	
+F. Coagulations - Exploding - 235678/378<br>
+G. Coral - Exploding - 45678/3<br>	
+H. Day & Night - Stable - 34678/3678<br>
+I. Diamoeba - Chaotic - 5678/35678<br>
+J. Flakes - Expanding - 012345678/3<br>
+K. Gnarl - Exploding - 1/1<br>
+L. HighLife - Chaotic - 23/36<br>
+M. Long Life - Stable - 5/345<br>
+N. Maze - Exploding - 12345/3<br>
+O. Mazectric - Exploding - 1234/3<br>
+P. Move - Stable - 245/368<br>
+Q. Pseudo Life - Chaotic - 238/357<br>
+R. Replicator - Exploding - 1357/1357<br>
+S. Stains - Stable - 235678/3678<br>
+T. WalledCities - Stable - 2345/45678<br>
 
-	A. Conway's Life - Chaotic - 23/3<br>
-	B. 2x2 - Chaotic - 125/36<br>	
-	C. 34 Life - Exploding - 34/34<br>	
-	D. Amoeba - Chaotic - 1358/357<br>	
-	E. Assimilation - Stable - 4567/345<br>	
-	F. Coagulations - Exploding - 235678/378<br>
-	G. Coral - Exploding - 45678/3<br>	
-	H. Day & Night - Stable - 34678/3678<br>
-	I. Diamoeba - Chaotic - 5678/35678<br>
-	J. Flakes - Expanding - 012345678/3<br>
-	K. Gnarl - Exploding - 1/1<br>
-	L. HighLife - Chaotic - 23/36<br>
-	M. Long Life - Stable - 5/345<br>
-	N. Maze - Exploding - 12345/3<br>
-	O. Mazectric - Exploding - 1234/3<br>
-	P. Move - Stable - 245/368<br>
-	Q. Pseudo Life - Chaotic - 238/357<br>
-	R. Replicator - Exploding - 1357/1357<br>
-	S. Stains - Stable - 235678/3678<br>
-	T. WalledCities - Stable - 2345/45678<br>
 
 ```
  Memory Map With Upper/Lower/Left/Right buffer.
