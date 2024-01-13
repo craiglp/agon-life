@@ -40,27 +40,44 @@ A ruleset is selected by typing the LOWER case letter of the ruleset on the star
 
 Life Family Cellular Automata
 	A. Conway's Life - Chaotic - 23/3
+	
 	B. 2x2 - Chaotic - 125/36
+	
 	C. 34 Life - Exploding - 34/34
+	
 	D. Amoeba - Chaotic - 1358/357
+	
 	E. Assimilation - Stable - 4567/345
+	
 	F. Coagulations - Exploding - 235678/378
+	
 	G. Coral - Exploding - 45678/3
+	
 	H. Day & Night - Stable - 34678/3678
+	
 	I. Diamoeba - Chaotic - 5678/35678
+	
 	J. Flakes - Expanding - 012345678/3
+	
 	K. Gnarl - Exploding - 1/1
+	
 	L. HighLife - Chaotic - 23/36
+	
 	M. Long Life - Stable - 5/345
+	
 	N. Maze - Exploding - 12345/3
+	
 	O. Mazectric - Exploding - 1234/3
+	
 	P. Move - Stable - 245/368
+	
 	Q. Pseudo Life - Chaotic - 238/357
+	
 	R. Replicator - Exploding - 1357/1357
-	S. Seeds - Exploding - 0/2
-	T. Serviettes - Exploding - 0/234
-	U. Stains - Stable - 235678/3678
-	V. WalledCities - Stable - 2345/45678
+	
+	S. Stains - Stable - 235678/3678
+	
+	T. WalledCities - Stable - 2345/45678
 
 ```
  Memory Map With Upper/Lower/Left/Right buffer.
@@ -97,9 +114,9 @@ VDP 1.03
 * ~~Full run, with keyboard scan. Run until stopped, rather than one generation per keystroke~~
 * ~~Need a more 'random' random number generator~~
 * Allow user to select Cellular Automata Ruleset to run other variations of Life
-* User defined ruleset
-* Graphical plotting
+* Graphical plotting or use buffered modes
 * User selected screen mode
+* User defined ruleset
 
 
 
