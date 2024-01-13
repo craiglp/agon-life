@@ -39,45 +39,27 @@ The matrix starts out with a random set of living cells. Each new generation is 
 A ruleset is selected by typing the LOWER case letter of the ruleset on the start up menu. Selecting 0 (zero) will exit the program without selecting a ruleset.
 
 Life Family Cellular Automata
-	A. Conway's Life - Chaotic - 23/3
-	
-	B. 2x2 - Chaotic - 125/36
-	
-	C. 34 Life - Exploding - 34/34
-	
-	D. Amoeba - Chaotic - 1358/357
-	
-	E. Assimilation - Stable - 4567/345
-	
-	F. Coagulations - Exploding - 235678/378
-	
-	G. Coral - Exploding - 45678/3
-	
-	H. Day & Night - Stable - 34678/3678
-	
-	I. Diamoeba - Chaotic - 5678/35678
-	
-	J. Flakes - Expanding - 012345678/3
-	
-	K. Gnarl - Exploding - 1/1
-	
-	L. HighLife - Chaotic - 23/36
-	
-	M. Long Life - Stable - 5/345
-	
-	N. Maze - Exploding - 12345/3
-	
-	O. Mazectric - Exploding - 1234/3
-	
-	P. Move - Stable - 245/368
-	
-	Q. Pseudo Life - Chaotic - 238/357
-	
-	R. Replicator - Exploding - 1357/1357
-	
-	S. Stains - Stable - 235678/3678
-	
-	T. WalledCities - Stable - 2345/45678
+
+	A. Conway's Life - Chaotic - 23/3<br>
+	B. 2x2 - Chaotic - 125/36<br>	
+	C. 34 Life - Exploding - 34/34<br>	
+	D. Amoeba - Chaotic - 1358/357<br>	
+	E. Assimilation - Stable - 4567/345<br>	
+	F. Coagulations - Exploding - 235678/378<br>
+	G. Coral - Exploding - 45678/3<br>	
+	H. Day & Night - Stable - 34678/3678<br>
+	I. Diamoeba - Chaotic - 5678/35678<br>
+	J. Flakes - Expanding - 012345678/3<br>
+	K. Gnarl - Exploding - 1/1<br>
+	L. HighLife - Chaotic - 23/36<br>
+	M. Long Life - Stable - 5/345<br>
+	N. Maze - Exploding - 12345/3<br>
+	O. Mazectric - Exploding - 1234/3<br>
+	P. Move - Stable - 245/368<br>
+	Q. Pseudo Life - Chaotic - 238/357<br>
+	R. Replicator - Exploding - 1357/1357<br>
+	S. Stains - Stable - 235678/3678<br>
+	T. WalledCities - Stable - 2345/45678<br>
 
 ```
  Memory Map With Upper/Lower/Left/Right buffer.
@@ -117,29 +99,3 @@ VDP 1.03
 * Graphical plotting or use buffered modes
 * User selected screen mode
 * User defined ruleset
-
-
-
-# License
-
-Copyright 2023 Craig L. Patterson
-
-Permission is hereby granted, free of charge, to any person obtaining a copy of this software
-and associated documentation files (the “Software”), to deal in the Software without restriction,
-including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
-and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so,
-subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all copies or substantial
-portions of the Software.
-
-THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT 
-LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN 
-NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, 
-WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE 
-SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
-
-
-
-
