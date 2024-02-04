@@ -7,10 +7,13 @@
 
 			XDEF	_main
 			
-			SCRMODE			EQU		17						;Screen Mode 17
+			SCRMODE			EQU		129						;Screen Mode 129 --Double buffered
+			ROWS			EQU		55						;Rows on screen -2 rows for status line
+			COLS			EQU		78						;Columns on screen
 
-			ROWS			EQU		69						;Rows on screen -2 rows for status line
-			COLS			EQU		98						;Columns on screen
+			;SCRMODE			EQU		8						;Screen Mode 8
+			;ROWS			EQU		25						;Rows on screen -2 rows for status line
+			;COLS			EQU		38						;Columns on screen
 
 			TOT_CELLS		EQU		(ROWS+2)*(COLS+1)+1		;Total number of cells
 
@@ -62,6 +65,7 @@ start:
 life:
 			CALL	print_statusline
 			CALL	print_cells
+			CALL	flip_buf
 			CALL	process_rules	;conway	;Do Life Rules on current cells
 
 			MOSCALL	mos_sysvars		;get the sysvars location - consider saving IX for speed
@@ -79,6 +83,11 @@ stop:		LD		HL, s_LIFE_END	;Escape pressed, clean up and exit
 			LD		A, 0
 			RST.LIS	18h
 										
+			LD		A, 22
+			RST.LIL 10h
+			LD		A, 0
+			RST.LIL	10h
+			
 			;Enable text cursor
 			LD		A, 23			;VDU 23
 			RST.LIL	10h
@@ -86,6 +95,9 @@ stop:		LD		HL, s_LIFE_END	;Escape pressed, clean up and exit
 			RST.LIL	10h			
 			LD		A, 1
 			RST.LIL	10h			
+
+			
+			CALL	flip_buf
 
 			LD		HL, 0			;Return, Error code = 0
 			RET
@@ -293,6 +305,7 @@ rnd:
 print_menu:
 			ld HL, s_MENU
 			call print_string
+			call flip_buf
 			ret
 
 ;Get user menu choice and set ruleset into BC, b_SURVIVE and b_BORN
@@ -371,7 +384,6 @@ process_rules:
 
 			ld	D, 00h					;Assume dead until found otherwise
 			;Check for births
-;			ld B, E
 			ld A, (b_BORN)
 			call checkBit
 			;A contains 1 if cell is born, 0 if not
@@ -418,10 +430,10 @@ checkBit:
 ; Loop to shift the accumulator right by the value of register B
 	ld d,e
 	dec e
-loop:
+$$:
     srl a
     dec e
-    jr nz, loop
+    jr nz, $B
 
 ; Check if the least significant bit is set
 	and 01h
@@ -439,68 +451,14 @@ check_bit_return:
 	pop de
 	ret
 	
-	
-;Update the matrix with Conway Rules.  
-;Nested For-loop with Rows and Columns.
-;The basic cell rules are:
-;    * Any live cell with two or three live neighbours survives.
-;    * Any dead cell with three live neighbours becomes a live cell.
-;    * All other live cells die in the next generation. Similarly, all other dead cells stay dead.
-;
-conway:
-			LD		IX,CURRSTART
-			LD		HL,NEXTSTART
-			LD		B,ROWS
-	NEWROWA:
-			PUSH	BC						;Save Registers
-			LD		B,COLS
-	NEWCOLA:
-			;Check the current cell and update count on number of live cells.  Use IX to
-			;make checking easier
-			LD		A,(IX-UPPER_LEFT)
-			ADD		A,(IX-UPPER_MID)
-			ADD		A,(IX-UPPER_RIGHT)
-			ADD		A,(IX-MID_LEFT)
-			ADD		A,(IX+MID_RIGHT)
-			ADD		A,(IX+BOTTOM_LEFT)
-			ADD		A,(IX+BOTTOM_MID)
-			ADD		A,(IX+BOTTOM_RIGHT)
+flip_buf:
+	PUSH	BC
+	LD		HL, s_flip_buf
+	LD		BC, s_flip_buf_end - s_flip_buf
+	RST.LIL	18h
+	POP		BC
+	RET
 
-		EVALUATE00:
-			;Evaluate surrounding cell count to create or destroy current cell
-			;This is the rules being applied for the cell
-			LD		D,01h					;Alive
-			CP		03h						;Check if 3 cells around
-			JR		Z,STOREC				;Save Alive cell	
-			LD		D,00h					;Dead
-			CP		02h						;Check if 2 cells around
-			JR		NZ,STOREC				;Save Dead cell if not 2
-			LD		A,(IX+0)				;Current Cell had only 2 cells around
-			AND		01h						;Keep it alive if already alive.
-			LD		D,A						;Load current cell in A
-
-		STOREC:
-			;Save the new cell to the Next Cell Cycle table
-			LD		A,D						;D stores cell evaluation
-			LD		(HL),A					;Update cell on Next Matrix
-			INC		HL						;Move to next Column
-			INC		IX						;Move to next Column
-			DJNZ	NEWCOLA					;Repeat until all columns are checked
-
-			INC		HL						;Skip left zero buffer
-			INC		IX						;Skip left zero buffer
-			POP		BC 
-			DJNZ	NEWROWA					;Repeat until all rows are checked
-
-			;Copy next matrix to current
-			LD		HL,NEXTSTART
-			LD		DE,CURRSTART
-			LD		BC,TOT_CELLS			;All cells (include left zero buffer)
-			LDIR							;Do the Copy
-
-			RET								;Exit
-		
-	
 table:
     db   82,97,120,111,102,116,20,12
 
@@ -523,6 +481,10 @@ init_screen:
 	db 23, 1, 0
 	db 12
 init_screen_end:
+
+s_flip_buf:
+	DB 23, 0, 195, 0
+s_flip_buf_end:
 
 s_MENU:		
 	DB	"\n\r\tLife Family Cellular Automata\n\r\n\r"

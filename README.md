@@ -96,6 +96,6 @@ VDP 1.03
 * ~~Full run, with keyboard scan. Run until stopped, rather than one generation per keystroke~~
 * ~~Need a more 'random' random number generator~~
 * Allow user to select Cellular Automata Ruleset to run other variations of Life
-* Graphical plotting or use buffered modes
+* Graphical plotting ~~or use buffered modes
 * User selected screen mode
 * User defined ruleset
